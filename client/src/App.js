@@ -14,9 +14,9 @@ state = {
       .then(res => this.setState({ data: res.express }))
       .catch(err => console.log(err));
   }
-    // Fetches our GET route from the Express server. (Note the route we are fetching matches the GET route from server.js
+    // t
   callBackendAPI = async () => {
-    const response = await fetch('/express_backend');
+    const response = await fetch('/query');
     const body = await response.json();
 
     if (response.status !== 200) {
