@@ -1,4 +1,4 @@
-const oracle = require('oracledb');
+const oracledb = require('oracledb');
 const dbConfig = require('./db-config.js')
 
 oracledb.getConnection({
