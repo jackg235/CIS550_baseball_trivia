@@ -11,8 +11,8 @@ class QuestionGenerator {
 		this.teams = getTeamOptions();  
 	}
 
+	// TODO get these from database call
 	getStatOptions() {
-		// TODO get these from database call
 		return ["STAT1", "STAT2"]
 	}
 
@@ -91,6 +91,12 @@ class QuestionGenerator {
 	   			return [question, query]
 		   		break;
 	   		case 4:
+				question = "Which {team} player holds the team record for the most ${stat} in a World Series?"
+				query = "SELECT name, MAX(${stat})" +
+						"FROM world_series_batting" + 
+						"WHERE TEAM = ${team}" +
+						"GROUP BY name" +
+						"HAVING ROWNUM == 1"
 
 	   			return [question, query]
 		   		break;
@@ -104,7 +110,19 @@ class QuestionGenerator {
 						"GROUP BY weight" +
 						"HAVING HR > 50";
 	   			return [question, query]
-		   		break;
+				break;
+				 
+			case 6:
+				question = "Which state has produced the most professional players?"
+				query = "SELECT birthState, COUNT(birthState)" +
+						"FROM People" +
+						"GROUP BY birthState" +
+						"SORT BY COUNT(birthState) ASC" + 
+						"HAVING ROWNUM == 1"
+
+				return [question, query]
+				break;
+
 		  	default:
 
 		}
