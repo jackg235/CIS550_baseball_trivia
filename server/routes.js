@@ -38,7 +38,7 @@ function query(req, res) {
   res.send('backend connected')
 };
 
-// The exported functions, which can be accessed in index.js.
+
 module.exports = {
   query : query
 }
