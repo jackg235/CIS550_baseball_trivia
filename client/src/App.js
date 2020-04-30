@@ -1,12 +1,21 @@
 
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
+import QuestionGenerator from './QuestionGenerator';
 
 class App extends Component {
-state = {
-    data: null
-  };
+  
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      data: null,
+      question: "",
+      query: ""
+    };
+
+    this.getRandomQuestion = this.getRandomQuestion.bind(this);
+  }
 
   componentDidMount() {
       // Call our fetch function below once the component mounts
@@ -14,6 +23,19 @@ state = {
       .then(res => this.setState({ data: res.express }))
       .catch(err => console.log(err));
   }
+
+  getRandomQuestion() {
+    var qg = new QuestionGenerator();
+    let questionAndQuery = qg.generateQuestion();
+    let questionRes = questionAndQuery[0];
+    let queryRes = questionAndQuery[1];
+
+    this.setState({
+      question: questionRes,
+      query: queryRes
+    })
+  }
+
     // t
   callBackendAPI = async () => {
     const response = await fetch('/query');
@@ -25,14 +47,18 @@ state = {
     return body;
   };
 
+
   render() {
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
+          <button onClick={this.getRandomQuestion}>
+            Next Question is
+          </button>
+          <div>
+            {this.state.question}
+          </div>
         </header>
-        // Render the newly fetched data inside of this.state.data 
         <p className="App-intro">{this.state.data}</p>
       </div>
     );
