@@ -29,9 +29,6 @@ class QuestionGenerator {
 		var yearIndex = Math.floor(Math.random() *  this.years.length);
 		var teamIndex = Math.floor(Math.random() * this.teams.length);
 		var questionIndex = Math.floor(Math.random() * 7);
-
-		console.log(questionIndex);
-
 		var stat = this.stats[statIndex];
 		var year = this.years[yearIndex];
 		var team = this.teams[teamIndex];
