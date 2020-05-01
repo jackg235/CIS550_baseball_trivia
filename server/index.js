@@ -6,6 +6,10 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 5000;
 
+app.use(cors({credentials: true, origin: 'http://localhost:3000'}));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+
 var config = require('./db-config.js');
 var mysql = require('mysql');
 
@@ -13,4 +17,4 @@ var mysql = require('mysql');
 app.listen(port, () => console.log(`Listening on port ${port}`));
 
 // create a GET route
-app.get('/query', routes.query);
+app.post('/query', routes.query);

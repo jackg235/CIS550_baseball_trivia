@@ -28,10 +28,7 @@ class App extends Component {
   }
 
   componentDidMount() {
-      // Call our fetch function below once the component mounts
-    this.callBackendAPI()
-      .then(res => this.setState({ data: res.express }))
-      .catch(err => console.log(err));
+    this.getRandomQuestion()
   }
 
   getRandomQuestion() {
@@ -39,6 +36,32 @@ class App extends Component {
     let questionAndQuery = qg.generateQuestion();
     let questionRes = questionAndQuery[0];
     let queryRes = questionAndQuery[1];
+    console.log(queryRes)
+    console.log('here')
+
+    fetch('http://localhost:5000/query', {
+      method: 'post',
+      headers: {
+        'Content-Type':'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+       "query": queryRes
+      })
+     }).then(res => {
+        // Convert the response data to a JSON.
+        return res.json();
+     }, err => {
+        // Print the error if there is one.
+        console.log(err);
+    }).then(results => {
+      if (!results) return;
+      console.log(results)
+      // Set the state of the genres list to the value returned by the HTTP response from the server.
+    }, err => {
+      // Print the error if there is one.
+      console.log(err);
+    });
 
     //should send out query here
     // update the index of the correct one
