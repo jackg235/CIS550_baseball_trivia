@@ -21,13 +21,14 @@ class App extends Component {
       countCorrect: 0,
       countQuestions: 0
     };
-
+    this.getHeaders = this.getHeaders.bind(this);
     this.getRandomQuestion = this.getRandomQuestion.bind(this);
     this.clickSubmit = this.clickSubmit.bind(this);
     this.shuffle = this.shuffle.bind(this);
   }
 
   componentDidMount() {
+    this.getHeaders()
     this.getRandomQuestion()
   }
 
@@ -37,6 +38,25 @@ class App extends Component {
         [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
+  }
+
+  getHeaders() {
+    fetch('http://localhost:5000/get_headers',
+    {
+      method: 'GET' 
+    }).then(res => {
+      // Convert the response data to a JSON.
+      return res.json();
+    }, err => {
+      console.log(err);
+    }).then(headers => {
+      if (!headers) return;
+      console.log(headers)
+
+    }, err => {
+      // Print the error if there is one.
+      console.log(err);
+    });
   }
 
   getRandomQuestion() {
@@ -57,16 +77,16 @@ class App extends Component {
        "query": queryRes
       })
      }).then(res => {
-        // Convert the response data to a JSON.
         return res.json();
      }, err => {
-        // Print the error if there is one.
         console.log(err);
     }).then(results => {
       if (!results) return;
 
+      // get the possible answers for the query
       var arrayRes = results["results"];
-
+      console.log(arrayRes)
+      // create array for 3 other viable choices
       var arr = [];
       while(arr.length < 3){
           var r = Math.ceil(Math.random() * (arrayRes.length - 1));
@@ -75,6 +95,7 @@ class App extends Component {
 
       console.log(arr);
 
+      // shuffle results
       var shuffledArray = [arrayRes[0], arrayRes[arr[0]], arrayRes[arr[1]], arrayRes[arr[2]]];
       this.shuffle(shuffledArray);
 
@@ -92,7 +113,6 @@ class App extends Component {
         correctIndex: correctIndex
       })
 
-      // Set the state of the genres list to the value returned by the HTTP response from the server.
     }, err => {
       // Print the error if there is one.
       console.log(err);

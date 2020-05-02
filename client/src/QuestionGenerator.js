@@ -16,6 +16,15 @@ class QuestionGenerator {
 		return ["home-runs", "wins"];
 	}
 
+	getBattingStats() {
+		return ['AB', 'R', 'Hits', '2B', '3B', 'HR', 'RBI', 'SB', 'CS', 'BB', 'SO']
+	}
+
+	getPitchingStats() {
+		return ['W', 'L', 'G', 'CG', 'SHO', 'IV', 'IPouts', 'H', 'ER', 'HR', 'BB', 'SO', 'ERA', 'IBB', 
+		'WP', 'HBP', 'BK', 'BFP', 'GF']
+	}
+
 	getYearOptions() {
 		return ["2004", "1983"];
 	}

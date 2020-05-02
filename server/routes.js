@@ -2,97 +2,71 @@ const oracledb = require('oracledb');
 const dbConfig = require('./db-config.js')
 let connection;
 
-oracledb.getConnection({
-	  user          : dbConfig.user,
-    password      : dbConfig.password,
-  	connectString : dbConfig.connectString
-    }, 
-    function(err, connection) {
-      if (err) {
-      	console.log(err)
-      	error = err; 
-      	return;
-      }     
-      connection.execute('select name from PLAYOFFBATTING', [], function(err, result) {
-        if (err) {error = err; return;}
- 
-        user = result.rows[0][0];
-        console.log(user)
-        error = null;
- 
-        connection.close(function(err) {
-          if (err) {console.log(err);}
-        });
-      })
-    }
-);
+function connect() {
+  return oracledb.getConnection({
+      user: dbConfig.user,
+      password: dbConfig.password,
+      connectString: dbConfig.connectString
+  });
+}
+
+function executeCmd(connection, cmd) {
+  return connection.execute(cmd, []);
+}
+
+function connectAndQuery(query, callback) {
+  let connection;
+  return connect().then(result => {
+    connection = result;
+    return executeCmd(connection, query);
+  }).then(result => {
+    console.log(result.rows)
+    return result.rows;
+  }).then(result => {
+    return connection.close().then(() => callback(result));
+  });
+}
 
 /* -------------------------------------------------- */
 /* ------------------- Route Handlers --------------- */
 /* -------------------------------------------------- */
 
-function get_results(query) {
-  var ret;
-  oracledb.getConnection({
-	  user          : dbConfig.user,
-    password      : dbConfig.password,
-  	connectString : dbConfig.connectString
-    }, 
-    function(err, connection) {
-      if (err) {
-      	console.log(err)
-      	error = err; 
-      	return;
-      }     
-      connection.execute('select name from PLAYOFFBATTING', [], function(err, result) {
-        if (err) {error = err; return;}
+function query(req, res) {
+  var q = req.body.query
+  var dummy = 'select nameGiven from People where rownum < 11';
+  connectAndQuery(dummy, function(result) {
+    res.json({'results' : result})
+  });
+};
 
-        ret = result.rows
-        console.log(ret)
-        connection.close(function(err) {
-          if (err) {console.log(err);}
-        });
+// currently doesn't work
+function headerCallback(callback) {
+  var headerArr = []
+  var tables = ['batting', 'pitching', 'people', 'collegeplaying', 'teams', 'school', 'playoffbatting']
+  var i;
+  for (i = 0; i < tables.length; i++) {
+    console.log('retrieving ' + tables[i])
+    var query = `select column_name from all_tab_cols where TABLE_NAME = "${tables[i]}"`
+    connectAndQuery(query, function(result) {
+      headerArr.push({
+        key : tables[i],
+        value : result
       })
-    }
-  );
-  return ret
+    });
+  }
+  console.log(headerArr)
+  callback(headerArr)
 }
 
 
-function query(req, res) {
-  var q = req.body.query
-  var ret;
-  console.log(q)
-  var dummy_query = 'select nameGiven from People where rownum < 11'
-  oracledb.getConnection({
-	  user          : dbConfig.user,
-    password      : dbConfig.password,
-  	connectString : dbConfig.connectString
-    }, 
-    function(err, connection) {
-      if (err) {
-      	console.log(err)
-      	error = err; 
-      	return;
-      }     
-      connection.execute(dummy_query, [], function(err, result) {
-        if (err) {
-          console.log(err)
-          return;
-        }
-
-        ret = result.rows
-        res.json({'results' : ret})
-        console.log(ret)
-        connection.close(function(err) {
-          if (err) {console.log(err);}
-        });
-      })
-    }
-  );
-};
+function get_headers(req, res) {
+  headerCallback(function(result) {
+    res.json(result)
+  });
+}
 
 
 module.exports = {
-  query : query
+  query : query,
+  get_headers : get_headers
 }

@@ -18,3 +18,5 @@ app.listen(port, () => console.log(`Listening on port ${port}`));
 
 // create a GET route
 app.post('/query', routes.query);
+
+app.get('/get_headers', routes.get_headers);
