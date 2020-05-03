@@ -1,10 +1,9 @@
-
 import React, { Component } from 'react';
+import { Jumbotron, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
 import './App.css';
 import QuestionGenerator from './QuestionGenerator';
 
 class App extends Component {
-  
   constructor(props) {
     super(props);
 
@@ -34,29 +33,29 @@ class App extends Component {
 
   shuffle(a) {
     for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
   }
 
   getHeaders() {
     fetch('http://localhost:5000/get_headers',
-    {
-      method: 'GET' 
-    }).then(res => {
-      // Convert the response data to a JSON.
-      return res.json();
-    }, err => {
-      console.log(err);
-    }).then(headers => {
-      if (!headers) return;
-      console.log(headers)
+      {
+        method: 'GET'
+      }).then(res => {
+        // Convert the response data to a JSON.
+        return res.json();
+      }, err => {
+        console.log(err);
+      }).then(headers => {
+        if (!headers) return;
+        console.log(headers)
 
-    }, err => {
-      // Print the error if there is one.
-      console.log(err);
-    });
+      }, err => {
+        // Print the error if there is one.
+        console.log(err);
+      });
   }
 
   getRandomQuestion() {
@@ -70,16 +69,16 @@ class App extends Component {
     fetch('http://localhost:5000/query', {
       method: 'post',
       headers: {
-        'Content-Type':'application/json',
+        'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
       body: JSON.stringify({
-       "query": queryRes
+        "query": queryRes
       })
-     }).then(res => {
-        return res.json();
-     }, err => {
-        console.log(err);
+    }).then(res => {
+      return res.json();
+    }, err => {
+      console.log(err);
     }).then(results => {
       if (!results) return;
 
@@ -88,9 +87,9 @@ class App extends Component {
       console.log(arrayRes)
       // create array for 3 other viable choices
       var arr = [];
-      while(arr.length < 3){
-          var r = Math.ceil(Math.random() * (arrayRes.length - 1));
-          if(arr.indexOf(r) === -1) arr.push(r);
+      while (arr.length < 3) {
+        var r = Math.ceil(Math.random() * (arrayRes.length - 1));
+        if (arr.indexOf(r) === -1) arr.push(r);
       }
 
       console.log(arr);
@@ -100,7 +99,7 @@ class App extends Component {
       this.shuffle(shuffledArray);
 
       console.log(shuffledArray);
-      
+
       let correctIndex = shuffledArray.indexOf(arrayRes[0]);
 
       this.setState({
@@ -120,11 +119,10 @@ class App extends Component {
   }
 
   clickSubmit() {
-
     var anythingChecked = document.getElementById("a0").checked || (
       document.getElementById("a1").checked) || (
         document.getElementById("a2").checked) || (
-          document.getElementById("a3").checked);
+        document.getElementById("a3").checked);
 
     if (anythingChecked) {
       var correctChecked = document.getElementById("a" + this.state.correctIndex).checked;
@@ -134,7 +132,7 @@ class App extends Component {
           countCorrect: this.state.countCorrect + 1,
           countQuestions: this.state.countQuestions + 1
         });
-        
+
       } else {
         this.setState({
           result: "Incorrect",
@@ -154,47 +152,46 @@ class App extends Component {
     const body = await response.json();
 
     if (response.status !== 200) {
-      throw Error(body.message) 
+      throw Error(body.message)
     }
     return body;
   };
 
-
   render() {
     return (
-      <div className="App">
-
-        <h3>{this.state.question}</h3>
-      
-        <input type="radio" id="a0" name="answer" value="0"></input>
-        <label for="a0">
-          {this.state.choice0}
-        </label><br></br>
-        <input type="radio" id="a1" name="answer" value="1"></input>
-        <label for="a1">
-          {this.state.choice1}
-        </label><br></br>
-        <input type="radio" id="a2" name="answer" value="2"></input>
-        <label for="a2">
-          {this.state.choice2}
-        </label><br></br>
-        <input type="radio" id="a3" name="answer" value="3"></input>
-        <label for="a3">
-          {this.state.choice3}
-        </label><br></br><br></br>
-
-
-        <button onClick={this.clickSubmit}>
-          Submit
-        </button>
-
-        <h3>
-          {this.state.result}
-        </h3>
-
-        <h3>{this.state.countCorrect} for {this.state.countQuestions}! ({(100 * this.state.countCorrect / (this.state.countQuestions + 0.0000000001)).toFixed(1)}%)</h3>
-
-        <p className="App-intro">{this.state.data}</p>
+      <div>
+        <Jumbotron>
+          <Form>
+            <FormGroup tag="fieldset">
+              <h3>{this.state.question}</h3>
+              <FormGroup check>
+                <Label check>
+                  <Input id="a0" type="radio" name="answer" value="0" />{this.state.choice0}
+                </Label>
+              </FormGroup>
+              <FormGroup check>
+                <Label check>
+                  <Input id="a1" type="radio" name="answer" value="1" />{this.state.choice1}
+                </Label>
+              </FormGroup>
+              <FormGroup check>
+                <Label check>
+                  <Input id="a2" type="radio" name="answer" value="2" />{this.state.choice2}
+                </Label>
+              </FormGroup>
+              <FormGroup check>
+                <Label check>
+                  <Input id="a3" type="radio" name="answer" value="3" />{this.state.choice3}
+                </Label>
+              </FormGroup>
+            </FormGroup>
+            <Button color="primary" onClick={this.clickSubmit}>Submit</Button>
+            <br/>
+            <br/>
+            <h4>{this.state.result}</h4>
+            <h4>{this.state.countCorrect} for {this.state.countQuestions}! ({(100 * this.state.countCorrect / (this.state.countQuestions + 0.0000000001)).toFixed(1)}%)</h4>
+          </Form>
+        </Jumbotron>
       </div>
     );
   }
