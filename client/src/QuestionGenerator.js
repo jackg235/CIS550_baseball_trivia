@@ -1,31 +1,26 @@
 class QuestionGenerator {
 
-	stats = [];
-	years = [];
-	teams = [];
-	battingStats = [];
-	pitchingStats = [];
-	peopleAttributes = [];
-	college = [];
-	teams = [];
-	schools = [];
-	playoffBatting = []
+	stats = ['HR'];
+	years = ['2004'];
+	teams = ["Philadelphia Phillies"];
+	battingStats = ['BB'];
+	pitchingStats = ['SO'];
+	teamStats = ['HR'];
+	peopleAttributes = ['WEIGHT'];
+	college = ['STATE'];
+	schools = ['CITY'];
+	playoffBatting = ['K']
 
 	constructor() {
-		//this.teams = this.getTeamOptions();
-		//this.stats = this.getStatOptions();
+		this.getTeamOptions();
 		this.years = this.getYearOptions();
-		this.battingStats = this.getStats('BATTING', 5);
-		this.pitchingStats = this.getStats('PITCHING', 5);
-		this.peopleAttributes = this.getStats('PEOPLE', 0);
-		this.college = this.getStats('COLLEGEPLAYING', 0); 
-		this.teamStats = this.getStats('TEAMS', 5);
-		this.playoffBatting = this.getStats('PLAYOFFBATTING', 3);
-		this.schools = this.getStats('SCHOOLS', 0); 
-	}
-	// TODO get these from database call
-	getStatOptions() {
-		return ["home-runs", "wins"];
+		this.getStats('BATTING', 5);
+		this.getStats('PITCHING', 5);
+		this.getStats('PEOPLE', 0);
+		this.getStats('COLLEGEPLAYING', 0); 
+		this.getStats('TEAMS', 5);
+		this.getStats('PLAYOFFBATTING', 3);
+		this.getStats('SCHOOLS', 0); 
 	}
 
 	getStats(tableName, numSkip) {
@@ -56,12 +51,42 @@ class QuestionGenerator {
 			for (i = numSkip; i < stats2d.length; i++) {
 				stats.push(stats2d[i][0])
 			}
-			return stats
+
+			switch (tableName) {
+				case 'BATTING':
+					this.battingStats = stats;
+					break;
+				case 'PITCHING': 
+					this.pitchingStats = stats;
+					break;
+				case "PEOPLE":
+					this.peopleAttributes = stats
+					break;
+				case 'COLLEGEPLAYING': 
+					this.college = stats;
+					break;
+				case 'TEAMS': 
+					this.teamStats = stats;
+					break;
+				case 'PLAYOFFBATTING': 
+					this.playoffBatting = stats;
+					break;
+				case 'SCHOOLS': 
+					this.schools = stats;
+					break;
+				default:
+					break;
+
+			}
 		})
 	}
 
 	getYearOptions() {
-		return ["2004", "1983"];
+		var output = [];
+		for (var i = 1890; i < 2019; i++) {
+			output.push(i)
+		}
+		return output;
 	}
 
 	getTeamOptions() {
@@ -91,6 +116,8 @@ class QuestionGenerator {
 			for (i = 0; i < stats2d.length; i++) {
 				stats.push(stats2d[i][0])
 			}
+
+			this.teams = stats;
 			return stats
 		})
 	}
@@ -99,16 +126,32 @@ class QuestionGenerator {
 		var statIndex = Math.floor(Math.random() * this.stats.length);
 		var yearIndex = Math.floor(Math.random() * this.years.length);
 		var teamIndex = Math.floor(Math.random() * this.teams.length);
+		var battingIndex = Math.floor(Math.random() * this.battingStats.length);
+		var pitchingIndex = Math.floor(Math.random() * this.pitchingStats.length);
+		var peopleIndex = Math.floor(Math.random() * this.peopleAttributes.length);
+		var teamStatsIndex = Math.floor(Math.random() * this.teamStats.length);
+		var collegeIndex = Math.floor(Math.random() * this.college.length);
+		var schoolsIndex = Math.floor(Math.random() * this.schools.length);
+		var playoffBattingIndex = Math.floor(Math.random() * this.playoffBatting.length);
 		var questionIndex = Math.floor(Math.random() * 7);
+
 		var stat = this.stats[statIndex];
 		var year = this.years[yearIndex];
 		var team = this.teams[teamIndex];
+		var bat = this.battingStats[battingIndex];
+		var pitch = this.pitchingStats[pitchingIndex];
+		var person = this.peopleAttributes[peopleIndex];
+		var teamStat = this.teamStats[teamStatsIndex];
+		var col = this.college[collegeIndex];
+		var schl = this.schools[schoolsIndex];
+		var playoffB = this.playoffBatting[playoffBattingIndex];
 
 		var question = "";
 		var query = "";
 
+
 		// return dummies for now bc queries r incorrect
-		var dummyQuestion = "I'm a dummy question! Look at me!"
+		var dummyQuestion = `Year: ${year}, Team: ${team}, TeamStat: ${teamStat}, BattingStats: ${bat}, PitchingStates: ${pitch}, Person: ${person}, College: ${col}, School: ${schl}, Playoffs: ${playoffB}`;
 		var dummyQuery =  'select nameGiven from People where rownum < 11';
 		return [dummyQuestion, dummyQuery];
 
