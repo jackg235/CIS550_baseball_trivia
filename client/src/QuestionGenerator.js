@@ -9,7 +9,7 @@ class QuestionGenerator {
 	peopleAttributes = ['WEIGHT'];
 	college = ['STATE'];
 	schools = ['CITY'];
-	playoffBatting = ['K']
+	playoffBatting = ['H']
 
 	constructor() {
 		this.getTeamOptions();
@@ -98,7 +98,7 @@ class QuestionGenerator {
 				'Accept': 'application/json'
 			},
 			body: JSON.stringify({
-				"query": 'select distinct name from teams'
+				"query": `select distinct name from teams where yearid > date '1960-04-01'`
 			})
 		}).then(res => {
 			return res.json();
@@ -133,7 +133,7 @@ class QuestionGenerator {
 		var collegeIndex = Math.floor(Math.random() * this.college.length);
 		var schoolsIndex = Math.floor(Math.random() * this.schools.length);
 		var playoffBattingIndex = Math.floor(Math.random() * this.playoffBatting.length);
-		var questionIndex = Math.floor(Math.random() * 2);
+		var questionIndex = Math.floor(Math.random() * 4);
 
 		var stat = this.stats[statIndex];
 		var year = this.years[yearIndex];
@@ -145,6 +145,8 @@ class QuestionGenerator {
 		var col = this.college[collegeIndex];
 		var schl = this.schools[schoolsIndex];
 		var playoffB = this.playoffBatting[playoffBattingIndex];
+
+		console.log(this.playoffBatting)
 
 		var question = "";
 		var query = "";
@@ -165,7 +167,7 @@ class QuestionGenerator {
 				return [question, query];
 			
 			case 1 :
-				var possibleStats = ['W', 'L', 'DivWin', 'R', 'H', '2B', 'HR', 'BB', 'SO', 'SB']
+				var possibleStats = ['W', 'L', 'R', 'H', 'TWOB', 'THREEB', 'HR', 'BB', 'SO', 'SB']
 				var caseStat = possibleStats[Math.floor(Math.random() * possibleStats.length)];
 
 				var decade = parseInt(year / 10, 10) * 10
@@ -199,6 +201,87 @@ class QuestionGenerator {
 				WHERE rownum < 11
 				ORDER BY wins`
 				return [question, query];
+
+			case 2 :
+				question = `Which state has produced the most players to play on the ${team}?`
+				query = `WITH players AS (
+					select distinct playerID
+					from batting b
+					join teams t on b.teamID = t.teamID
+					AND t.name = '${team}'
+				),
+				birth_states AS (
+					SELECT birthState, COUNT(*)
+					FROM People p
+					JOIN players l on p.playerid = l.playerid
+					GROUP BY birthState
+					ORDER BY COUNT(birthState) DESC
+				)
+				SELECT birthState 
+				from birth_states
+				WHERE rownum < 11`
+				return [question, query];
+
+			case 3 :
+				question = `Which team had the most ${teamStat} in a single season since ${year}
+				without winning the world series?`
+				var yr = year + '-04-01'
+				query = `WITH Year AS (
+					SELECT name, max(${teamStat}) AS homeruns
+					FROM Teams
+					WHERE yearID > date '${yr}'
+					AND WSwin != 'Y'
+					group by name
+					ORDER BY max(${teamStat}) DESC
+				)
+				SELECT name
+				FROM Year
+				where rownum < 11`
+				return [question, query];
+
+			case 4 :
+				var possibleStats = ['W', 'R', 'H', 'TWOB', 'THREEB', 'HR','SB']
+				var possibleNums = [50, 20, 50, 20, 20, 20, 10]
+				var idx = Math.floor(Math.random() * possibleStats.length)
+				var stat = possibleStats[idx]
+				var num = possibleNums[idx]
+				if (year > 1980) {
+					year = year - 40
+				}
+				var yearVal = year + ''
+				question = `What college has produced the most players that:
+				a. have won a WS
+				b. have over 50 hits (some number for some stat)
+				c. have played on at least 2 different teams
+				since 1960 (input year)?`
+				query = `
+				WITH ws_teams AS (
+					SELECT teamid, 
+					FROM teams 
+					WHERE yearID > date '1959-04-01'
+					AND wswin = 'Y'
+				),
+				ws_batters AS (
+					SELECT playerid, sum(H), count(distinct b.teamid)
+					FROM batting b
+					JOIN ws_teams w ON b.teamid = w.teamid
+					AND b.yearid = w.yearID
+					GROUP BY playerid
+					HAVING sum(H) > 50
+					AND count(distinct b.teamid) > 1
+				),
+				colleges AS (
+					SELECT schoolid, count(w.playerid) AS num
+					FROM ws_batters w 
+					JOIN collegeplaying c ON w.playerid = c.playerid
+					
+					GROUP BY schoolid
+				)
+				SELECT name_full 
+				FROM colleges c join schools s on c.schoolid = s.schoolid
+				WHERE rownum < 11
+				ORDER BY num DESC`
+				return [question, query]
 
 		}
 

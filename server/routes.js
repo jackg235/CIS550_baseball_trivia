@@ -27,7 +27,6 @@ function query(req, res) {
     connection = result;
     return executeCmd(connection, query);
   }).then(result => {
-    console.log(result.rows)
     return result.rows;
   }).then(result => {
     return connection.close().then(() => res.json({'results' : result}));
