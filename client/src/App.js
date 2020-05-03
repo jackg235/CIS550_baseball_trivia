@@ -91,15 +91,27 @@ class App extends Component {
 
       let correctIndex = shuffledArray.indexOf(arrayRes[0]);
 
-      this.setState({
-        question: questionRes,
-        query: queryRes,
-        choice0: shuffledArray[0],
-        choice1: shuffledArray[1],
-        choice2: shuffledArray[2],
-        choice3: shuffledArray[3],
-        correctIndex: correctIndex
-      })
+      if (shuffledArray[0].length == 2) {
+        this.setState({
+          question: questionRes,
+          query: queryRes,
+          choice0: shuffledArray[0][0] + ", " + shuffledArray[0][1],
+          choice1: shuffledArray[1][0] + ", " + shuffledArray[1][1],
+          choice2: shuffledArray[2][0] + ", " + shuffledArray[2][1],
+          choice3: shuffledArray[3][0] + ", " + shuffledArray[3][1],
+          correctIndex: correctIndex
+        })
+      } else {
+        this.setState({
+          question: questionRes,
+          query: queryRes,
+          choice0: shuffledArray[0],
+          choice1: shuffledArray[1],
+          choice2: shuffledArray[2],
+          choice3: shuffledArray[3],
+          correctIndex: correctIndex
+        })
+      }
 
     }, err => {
       // Print the error if there is one.
