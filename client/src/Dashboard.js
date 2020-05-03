@@ -1,7 +1,6 @@
 import React from 'react';
 import './index.css';
-import { Button } from "reactstrap";
-import { useState } from 'react';
+import './Dashboard.css';
 import App from './App.js';
 import Search from './Search.js';
 
@@ -51,7 +50,15 @@ class Dashboard extends React.Component {
     return (
       <div>
         <Navbar color="light" light expand="md">
-          <NavbarBrand href="/">Baseball Trivia</NavbarBrand>
+          <NavbarBrand href="/">
+          <img 
+            src="https://www.stickpng.com/assets/images/580b585b2edbce24c47b2acf.png" 
+            weign="40"
+            height="40"
+            alt="baseball img"
+          />
+            Baseball Trivia
+          </NavbarBrand>
           <Nav className="mr-auto" navbar>
             <NavItem>
               <NavLink href="#" onClick={() => this.setTabValue(0)}>Single Player</NavLink>
