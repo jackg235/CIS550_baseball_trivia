@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Jumbotron, Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
+import { Jumbotron, Button, Form, FormGroup, Label, Input, FormText, Modal, ModalBody, ModalFooter } from 'reactstrap';
 import './App.css';
 import QuestionGenerator from './QuestionGenerator';
+import Timer from './Timer';
 
 class App extends Component {
 
@@ -20,11 +21,14 @@ class App extends Component {
       choice3: "",
       result: "Good Luck!",
       countCorrect: 0,
-      countQuestions: 0
+      countQuestions: 0,
+      modalIsOpen: false
     };
     this.getRandomQuestion = this.getRandomQuestion.bind(this);
     this.clickSubmit = this.clickSubmit.bind(this);
     this.shuffle = this.shuffle.bind(this);
+    this.modalToggle = this.modalToggle.bind(this);
+    this.resetGame = this.resetGame.bind(this);
   }
 
   async componentDidMount() {
@@ -137,6 +141,23 @@ class App extends Component {
     return body;
   };
 
+  modalToggle() {
+    console.log("modalToggle");
+    this.setState({
+      modalIsOpen: !this.state.modalIsOpen
+    })
+    console.log(this.state.modalIsOpen);
+  }
+
+  resetGame() {
+    this.setState({
+      countCorrect: 0,
+      countQuestions: 0
+    });
+    this.modalToggle();
+  }
+
+
   render() {
     return (
       <div>
@@ -166,12 +187,21 @@ class App extends Component {
               </FormGroup>
             </FormGroup>
             <Button color="primary" onClick={this.clickSubmit}>Submit</Button>
+            <Timer modalToggle={this.modalToggle} />
             <br />
             <br />
             <h4>{this.state.result}</h4>
             <h4>{this.state.countCorrect} for {this.state.countQuestions}! ({(100 * this.state.countCorrect / (this.state.countQuestions + 0.0000000001)).toFixed(1)}%)</h4>
           </Form>
         </Jumbotron>
+        <Modal isOpen={this.state.modalIsOpen} toggle={this.resetGame}>
+            <ModalBody>
+              You got {this.state.countCorrect} questions correct within the time allotted!
+            </ModalBody>
+            <ModalFooter>
+              <Button onClick={this.resetGame}>Play Again</Button>
+            </ModalFooter>
+        </Modal>
       </div>
     );
   }
