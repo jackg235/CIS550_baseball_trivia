@@ -1,26 +1,31 @@
 import React, { Component } from 'react';
 import { Jumbotron, Button, Form, FormGroup, Label, Input, Table, Col } from 'reactstrap';
 
+const batting_attributes = ["playerID", "yearID", "stint", "teamID", "lgID", "G", "AB", "R", "H", "2B", "TWOB", "THREEB", "3B", "HR", "RBI", "SB", "CS", "BB", "SO", "IBB", "HBP", "SH", "SF", "GIDP"];
+const pitching_attributes = ["playerID", "yearID", "stint", "teamID", "lgID", "W", "L", "G", "GS", "CG", "SHO", "SV", "IPouts", "H", "ER", "HR", "BB", "SO", "BAOpp", "ERA", "IBB", "WP", "HBP", "BK", "BFP", "GF", "R", "SH", "SF", "GIDP"];
+
 class Search extends Component {
   constructor(props) {
     super(props);
     this.state = {
       data: null,
+      year: 1871,
+
     };
+
+    this.getYears = this.getYears.bind(this);
+  }
+
+  getYears() {
+    let years = [];         
+     for (let i = 1871; i <= 2019; i++) {             
+          years.push(<option key={i} value={i}>{i}</option>);
+     }
+     return years;  
   }
 
   componentDidMount() {
   }
-
-  callBackendAPI = async () => {
-    const response = await fetch('/query');
-    const body = await response.json();
-
-    if (response.status !== 200) {
-      throw Error(body.message)
-    }
-    return body;
-  };
 
   render() {
     return (
@@ -29,7 +34,6 @@ class Search extends Component {
           <Form>
             <FormGroup tag="fieldset">
               <h3>Enter your search fields</h3>
-
             </FormGroup>
           </Form>
           <Form>
@@ -39,6 +43,16 @@ class Search extends Component {
                 <Input type="select" name="select" id="selectPlayerOrTeam">
                   <option>Player</option>
                   <option>Team</option>
+                </Input>
+              </Col>
+            </FormGroup>
+
+            <FormGroup row>
+              <Label for="selectPlayerOrTeam" sm={2}>Criteria</Label>
+              <Col sm={10}>
+                <Input type="select" name="select" id="selectBattingOrPitching">
+                  <option>Batting</option>
+                  <option>Pitching</option>
                 </Input>
               </Col>
             </FormGroup>
@@ -75,9 +89,11 @@ class Search extends Component {
             </FormGroup>
 
             <FormGroup row>
-              <Label for="exampleText" sm={2}>Year</Label>
+              <Label for="year" sm={2}>Year</Label>
               <Col sm={10}>
-                <Input type="text" name="text" id="exampleText" />
+                <Input type="select" name="text" id="year">
+                  { this.getYears() }
+                </Input>
               </Col>
             </FormGroup>
 
