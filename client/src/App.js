@@ -4,10 +4,12 @@ import './App.css';
 import QuestionGenerator from './QuestionGenerator';
 
 class App extends Component {
+
   constructor(props) {
     super(props);
 
     this.state = {
+      qg : new QuestionGenerator(),
       data: null,
       question: "",
       query: "",
@@ -20,14 +22,12 @@ class App extends Component {
       countCorrect: 0,
       countQuestions: 0
     };
-    this.getHeaders = this.getHeaders.bind(this);
     this.getRandomQuestion = this.getRandomQuestion.bind(this);
     this.clickSubmit = this.clickSubmit.bind(this);
     this.shuffle = this.shuffle.bind(this);
   }
 
-  componentDidMount() {
-    this.getHeaders()
+  async componentDidMount() {
     this.getRandomQuestion()
   }
 
@@ -39,32 +39,12 @@ class App extends Component {
     return a;
   }
 
-  getHeaders() {
-    fetch('http://localhost:5000/get_headers',
-      {
-        method: 'GET'
-      }).then(res => {
-        // Convert the response data to a JSON.
-        return res.json();
-      }, err => {
-        console.log(err);
-      }).then(headers => {
-        if (!headers) return;
-        console.log(headers)
-
-      }, err => {
-        // Print the error if there is one.
-        console.log(err);
-      });
-  }
 
   getRandomQuestion() {
-    var qg = new QuestionGenerator();
-    let questionAndQuery = qg.generateQuestion();
+    let questionAndQuery = this.state.qg.generateQuestion();
     let questionRes = questionAndQuery[0];
     let queryRes = questionAndQuery[1];
     console.log(queryRes)
-    console.log('here')
 
     fetch('http://localhost:5000/query', {
       method: 'post',
