@@ -186,8 +186,8 @@ class App extends Component {
               </FormGroup>
             </FormGroup>
             <Button color="primary" onClick={this.clickSubmit}>Submit</Button>
-            <br/>
-            <br/>
+            <br />
+            <br />
             <h4>{this.state.result}</h4>
             <h4>{this.state.countCorrect} for {this.state.countQuestions}! ({(100 * this.state.countCorrect / (this.state.countQuestions + 0.0000000001)).toFixed(1)}%)</h4>
           </Form>

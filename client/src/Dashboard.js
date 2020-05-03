@@ -3,18 +3,14 @@ import './index.css';
 import { Button } from "reactstrap";
 import { useState } from 'react';
 import App from './App.js';
+import Search from './Search.js';
+
 import {
-  Collapse,
   Navbar,
-  NavbarToggler,
   NavbarBrand,
   Nav,
   NavItem,
   NavLink,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
   NavbarText
 } from 'reactstrap';
 
@@ -44,7 +40,12 @@ class Dashboard extends React.Component {
     }
 
     if (this.state.tabValue === 1) {
-      //   tabPage = <Search />;
+      tabPage = <App />
+      //   tabPage = <MultiPlayer />;
+    }
+
+    if (this.state.tabValue === 2) {
+      tabPage = <Search />;
     }
 
     return (
@@ -53,10 +54,13 @@ class Dashboard extends React.Component {
           <NavbarBrand href="/">Baseball Trivia</NavbarBrand>
           <Nav className="mr-auto" navbar>
             <NavItem>
-              <NavLink href="#" onClick={() => this.setTabValue(0)}>Trivia</NavLink>
+              <NavLink href="#" onClick={() => this.setTabValue(0)}>Single Player</NavLink>
             </NavItem>
             <NavItem>
-              <NavLink href="#" onClick={() => { console.log("works"); }}>Search</NavLink>
+              <NavLink href="#" onClick={() => this.setTabValue(1)}>Multi Player</NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink href="#" onClick={() => this.setTabValue(2)}>Search</NavLink>
             </NavItem>
           </Nav>
           <NavbarText>CIS 450</NavbarText>
