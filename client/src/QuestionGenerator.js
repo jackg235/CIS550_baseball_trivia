@@ -13,7 +13,7 @@ class QuestionGenerator {
 
 	constructor() {
 		//this.teams = this.getTeamOptions();
-		this.stats = this.getStatOptions();
+		//this.stats = this.getStatOptions();
 		this.years = this.getYearOptions();
 		this.battingStats = this.getStats('BATTING', 5);
 		this.pitchingStats = this.getStats('PITCHING', 5);
@@ -106,6 +106,11 @@ class QuestionGenerator {
 
 		var question = "";
 		var query = "";
+
+		// return dummies for now bc queries r incorrect
+		var dummyQuestion = "I'm a dummy question! Look at me!"
+		var dummyQuery =  'select nameGiven from People where rownum < 11';
+		return [dummyQuestion, dummyQuery];
 
 		switch (questionIndex) {
 			case 0:
