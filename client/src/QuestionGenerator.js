@@ -83,7 +83,7 @@ class QuestionGenerator {
 
 	getYearOptions() {
 		var output = [];
-		for (var i = 1890; i < 2019; i++) {
+		for (var i = 1900; i < 2019; i++) {
 			output.push(i)
 		}
 		return output;
@@ -133,7 +133,7 @@ class QuestionGenerator {
 		var collegeIndex = Math.floor(Math.random() * this.college.length);
 		var schoolsIndex = Math.floor(Math.random() * this.schools.length);
 		var playoffBattingIndex = Math.floor(Math.random() * this.playoffBatting.length);
-		var questionIndex = Math.floor(Math.random() * 7);
+		var questionIndex = Math.floor(Math.random() * 2);
 
 		var stat = this.stats[statIndex];
 		var year = this.years[yearIndex];
@@ -148,6 +148,59 @@ class QuestionGenerator {
 
 		var question = "";
 		var query = "";
+
+		switch (questionIndex) {
+			case 0:
+				question = `Who had the most ${playoffB} in the ${year} World Series and what team did he play for?`
+				var yrLow = year + '-04-01'
+				year += 1
+				var yrHigh = year + '-04-01'
+				query = `WITH players AS ( `
+				+ ` SELECT name, team ` 
+				+ ` FROM playoffbatting `
+				+ ` where year between date '${yrLow}' and date '${yrHigh}'` 
+				+ ` AND round = 'WS'`
+				+ ` order by ${playoffB} DESC )`
+				+ ` Select distinct * from players where rownum < 11`
+				return [question, query];
+			
+			case 1 :
+				var possibleStats = ['W', 'L', 'DivWin', 'R', 'H', '2B', 'HR', 'BB', 'SO', 'SB']
+				var caseStat = possibleStats[Math.floor(Math.random() * possibleStats.length)];
+
+				var decade = parseInt(year / 10, 10) * 10
+				question = `In the ${decade}'s, which team had the most ${caseStat}'s in the MLB with a pitcher 
+				who started over 50 games with an average ERA of less than 4? Who was that pitcher?`
+				console.log(decade)
+				var decadeLow = decade + '-04-01'
+				decade += 10
+				var decadeHigh = decade + '-04-01'
+				query = `WITH decade AS (
+					SELECT Name AS team_name, teamID, sum(${caseStat}) AS wins
+					FROM Teams
+					WHERE yearID between date '${decadeLow}' and date '${decadeHigh}'
+					group by Name, teamID
+				),
+				pitcher AS (
+					SELECT playerID, teamID, avg(era), sum(gs)
+					FROM pitching
+					WHERE yearID between date '${decadeLow}' and date '${decadeHigh}'
+					group by playerID, teamID
+					HAVING avg(era) < 4 AND sum(gs) > 50
+				),
+				pitcher_name AS (
+					SELECT nameGiven, team_name, wins
+					FROM pitcher t 
+					JOIN people p ON t.playerid = p.playerid
+					JOIN decade d ON d.teamID = t.teamID
+				)
+				SELECT team_name, nameGiven
+				FROM pitcher_name
+				WHERE rownum < 11
+				ORDER BY wins`
+				return [question, query];
+
+		}
 
 
 		// return dummies for now bc queries r incorrect
