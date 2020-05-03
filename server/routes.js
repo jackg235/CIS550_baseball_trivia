@@ -1,7 +1,5 @@
 const oracledb = require('oracledb');
 const dbConfig = require('./db-config.js')
-let connection;
-
 function connect() {
   return oracledb.getConnection({
       user: dbConfig.user,
@@ -31,6 +29,25 @@ function connectAndQuery(query, callback) {
 /* ------------------- Route Handlers --------------- */
 /* -------------------------------------------------- */
 
+const queryPromise = (fileName) => {
+  return new Promise((resolve, reject) => {
+    if(typeof fileName !== 'string') {
+      return reject('Argument should be string')
+    }
+
+    fs.readFile(fileName, 'utf8', (err, data) => {
+      if(err) {
+        return reject(err)
+      }
+      const lines = data.trim().split('\n');
+      resolve(lines)
+    })
+  })
+}
+
+
+
+
 function query(req, res) {
   var q = req.body.query
   var dummy = 'select nameGiven from People where rownum < 11';
@@ -42,26 +59,31 @@ function query(req, res) {
 // currently doesn't work
 function headerCallback(callback) {
   var headerArr = []
-  var tables = ['batting', 'pitching', 'people', 'collegeplaying', 'teams', 'school', 'playoffbatting']
+  var tables = ['BATTING', 'PITCHING', 'PEOPLE', 'COLLEGEPLAYING', 'TEAMS', 'SCHOOL', 'PLAYOFFBATTING']
   var i;
   for (i = 0; i < tables.length; i++) {
     console.log('retrieving ' + tables[i])
-    var query = `select column_name from all_tab_cols where TABLE_NAME = "${tables[i]}"`
+    var query = `select column_name from all_tab_cols where TABLE_NAME = '${tables[i]}'`
     connectAndQuery(query, function(result) {
       headerArr.push({
         key : tables[i],
         value : result
       })
+      console.log(headerArr)
     });
   }
-  console.log(headerArr)
   callback(headerArr)
 }
 
 
 function get_headers(req, res) {
+  res.json({'in progress' : 'in progress'})
+  return
   headerCallback(function(result) {
-    res.json(result)
+    console.log('headers')
+    console.log(result)
+    console.log('headers done')
+    res.json({'results' : result})
   });
 }
 
