@@ -70,6 +70,10 @@ class App extends Component {
       // get the possible answers for the query
       var arrayRes = results["results"];
       console.log(arrayRes)
+      if (arrayRes.length < 4) {
+        console.log('not enough query results');
+        return this.getRandomQuestion();
+      }
       // create array for 3 other viable choices
       var arr = [];
       while (arr.length < 3) {
