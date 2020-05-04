@@ -29,9 +29,10 @@ class Multiplayer extends Component {
           playerTwoScore: 0,
           playerThreeScore: 0,
           playerFourScore: 0,
-          targetScore: 3,
+          targetScore: 5,
           submitOrNext: "Submit",
-          modalIsOpen: false
+          modalIsOpen: false,
+          showGame: false
         };
     
         this.getRandomQuestion = this.getRandomQuestion.bind(this);
@@ -39,6 +40,8 @@ class Multiplayer extends Component {
         this.shuffle = this.shuffle.bind(this);
         this.modalToggle = this.modalToggle.bind(this);
         this.resetGame = this.resetGame.bind(this);
+        this.toggleGameElements = this.toggleGameElements.bind(this);
+        this.resetNoModal = this.resetNoModal.bind(this);
     
       }
     
@@ -235,7 +238,25 @@ class Multiplayer extends Component {
           playerThreeScore: 0,
           playerFourScore: 0
         });
+        this.toggleGameElements();
         this.modalToggle();
+      }
+
+      resetNoModal() {
+        this.setState({
+          currentPlayer: 1,
+          playerOneScore: 0,
+          playerTwoScore: 0,
+          playerThreeScore: 0,
+          playerFourScore: 0
+        });
+        this.toggleGameElements();
+      }
+
+      toggleGameElements() {
+        this.setState({
+          showGame: !this.state.showGame
+        }) 
       }
 
       render() {
@@ -244,8 +265,10 @@ class Multiplayer extends Component {
             <div class="form-wrapper3">
                 <h4 style={{textAlign: "center"}}>First to 5 wins!</h4>
                 <h4 style={{textAlign: "center"}}> Player 1: {this.state.playerOneScore} | Player 2: {this.state.playerTwoScore} | Player 3: {this.state.playerThreeScore} | Player 4: {this.state.playerFourScore}</h4>
+                <Button style={{ fontWeight: "bold", textAlign: "center"}} color="primary" onClick={this.toggleGameElements}>Start</Button>
+                <Button style={{ fontWeight: "bold", textAlign: "center"}} color="primary" onClick={this.resetNoModal}>Reset</Button>
             </div>
-            <div class="form-wrapper">
+            <div class="form-wrapper" id="ge" style={{ display: this.state.showGame ? "block" : "none" }}>
               <h4 style={{textAlign: "center"}}>Player {this.state.currentPlayer}, you're up!</h4>
               <h3>{this.state.question}</h3>
               <Form>
