@@ -52,7 +52,7 @@ class QuestionGenerator {
 			// ignore first few stats (player id, league id, etc.)
 			var ig = 0
 			if (tableName == 'TEAMS') {
-				ig = 3
+				ig = 5
 			}
 			for (i = numSkip; i < stats2d.length - ig; i++) {
 				stats.push(stats2d[i][0])
