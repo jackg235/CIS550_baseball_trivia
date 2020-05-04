@@ -3,6 +3,7 @@ import './index.css';
 import './Dashboard.css';
 import App from './App.js';
 import Search from './Search.js';
+import Multiplayer from './MultiPlayer.js';
 
 import {
   Navbar,
@@ -39,8 +40,7 @@ class Dashboard extends React.Component {
     }
 
     if (this.state.tabValue === 1) {
-      tabPage = <App />
-      //   tabPage = <MultiPlayer />;
+      tabPage = <Multiplayer />
     }
 
     if (this.state.tabValue === 2) {
