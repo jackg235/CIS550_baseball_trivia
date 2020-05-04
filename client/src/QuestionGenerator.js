@@ -1,8 +1,8 @@
 class QuestionGenerator {
 
 	stats = ['HR'];
-	years = ['2004'];
-	teams = ["Philadelphia Phillies"];
+	years = ['2004', '1920', '1987'];
+	teams = ["Philadelphia Phillies", "New York Mets", "Pittsburgh Pirates"];
 	battingStats = ['BB'];
 	pitchingStats = ['SO'];
 	teamStats = ['HR'];
@@ -10,6 +10,7 @@ class QuestionGenerator {
 	college = ['STATE'];
 	schools = ['CITY'];
 	playoffBatting = ['H']
+	json = require('./stats.json');
 
 	constructor() {
 		this.getTeamOptions();
@@ -21,6 +22,7 @@ class QuestionGenerator {
 		this.getStats('TEAMS', 5);
 		this.getStats('PLAYOFFBATTING', 3);
 		this.getStats('SCHOOLS', 0); 
+		
 	}
 
 	getStats(tableName, numSkip) {
@@ -153,7 +155,7 @@ class QuestionGenerator {
 
 		switch (questionIndex) {
 			case 0:
-				question = `Who had the most ${playoffB} in the ${year} World Series and what team did he play for?`
+				question = `Who had the most ${this.json[playoffB]} in the ${year} World Series and what team did he play for?`
 				var yrLow = year + '-04-01'
 				year += 1
 				var yrHigh = year + '-04-01'
@@ -171,7 +173,7 @@ class QuestionGenerator {
 				var caseStat = possibleStats[Math.floor(Math.random() * possibleStats.length)];
 
 				var decade = parseInt(year / 10, 10) * 10
-				question = `In the ${decade}'s, which team had the most ${caseStat}'s in the MLB with a pitcher 
+				question = `In the ${decade}'s, which team had the most ${this.json[caseStat]}'s in the MLB with a pitcher 
 				who started over 50 games with an average ERA of less than 4? Who was that pitcher?`
 				console.log(decade)
 				var decadeLow = decade + '-04-01'
@@ -223,7 +225,7 @@ class QuestionGenerator {
 				return [question, query];
 
 			case 3 :
-				question = `Which team had the most ${teamStat} in a single season since ${year}
+				question = `Which team had the most ${this.json[teamStat]} in a single season since ${year}
 				without winning the world series?`
 				var yr = year + '-04-01'
 				query = `WITH Year AS (
