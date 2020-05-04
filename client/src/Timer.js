@@ -53,6 +53,7 @@ class Timer extends Component {
             clearInterval(this.intervalHandle);
         } 
         this.intervalHandle = setInterval(this.tick, 1000);
+        this.props.toggleGameElements();
     }
 
     render() {

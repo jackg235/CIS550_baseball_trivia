@@ -25,16 +25,24 @@ class App extends Component {
       color2: "black",
       color3: "black",
       result: "Good Luck!",
+      name: "",
       countCorrect: 0,
       countQuestions: 0,
       submitOrNext: "Submit",
-      modalIsOpen: false
+      modalIsOpen: false,
+      showGame: false
     };
     this.getRandomQuestion = this.getRandomQuestion.bind(this);
     this.clickSubmit = this.clickSubmit.bind(this);
     this.shuffle = this.shuffle.bind(this);
     this.modalToggle = this.modalToggle.bind(this);
     this.resetGame = this.resetGame.bind(this);
+    this.toggleGameElements = this.toggleGameElements.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(event) {
+    this.setState({value: event.target.value});
   }
 
   async componentDidMount() {
@@ -212,11 +220,9 @@ class App extends Component {
   };
 
   modalToggle() {
-    console.log("modalToggle");
     this.setState({
       modalIsOpen: !this.state.modalIsOpen
     })
-    console.log(this.state.modalIsOpen);
   }
 
   resetGame() {
@@ -225,17 +231,26 @@ class App extends Component {
       countQuestions: 0
     });
     this.modalToggle();
+    this.toggleGameElements();
   }
 
+  toggleGameElements() {
+    this.setState({
+      name: document.getElementById("text").value,
+      showGame: !this.state.showGame
+    })
+  }
 
   render() {
     return (
       <div>
         <div class="form-wrapper2">
-          <Timer modalToggle={this.modalToggle} />
+          <Timer modalToggle={this.modalToggle} toggleGameElements={this.toggleGameElements}/>
+          <br></br>
+          <textarea id={"text"} value={this.state.value} onChange={this.handleChange} rows="1" />
         </div>
-        <div class="form-wrapper">
-          <h3>{this.state.question}</h3>
+        <div class="form-wrapper" id="gameElements" style={ {display: this.state.showGame ? "block" : "none"} }>
+            <h3>{this.state.question}</h3>
           <Form>
               <FormGroup tag="fieldset">
                 <FormGroup check>
@@ -264,7 +279,7 @@ class App extends Component {
             </Form>
             <Modal isOpen={this.state.modalIsOpen} toggle={this.resetGame}>
               <ModalBody>
-                You got {this.state.countCorrect} questions correct within the time allotted!
+                {this.state.name}, you got {this.state.countCorrect} questions correct within the time allotted!
               </ModalBody>
               <ModalFooter>
                 <Button onClick={this.resetGame}>Play Again</Button>

@@ -32,7 +32,8 @@ class Multiplayer extends Component {
           targetScore: 5,
           submitOrNext: "Submit",
           modalIsOpen: false,
-          showGame: false
+          showGame: false,
+          startOrReset: "Start"
         };
     
         this.getRandomQuestion = this.getRandomQuestion.bind(this);
@@ -41,7 +42,6 @@ class Multiplayer extends Component {
         this.modalToggle = this.modalToggle.bind(this);
         this.resetGame = this.resetGame.bind(this);
         this.toggleGameElements = this.toggleGameElements.bind(this);
-        this.resetNoModal = this.resetNoModal.bind(this);
     
       }
     
@@ -242,21 +242,25 @@ class Multiplayer extends Component {
         this.modalToggle();
       }
 
-      resetNoModal() {
-        this.setState({
-          currentPlayer: 1,
-          playerOneScore: 0,
-          playerTwoScore: 0,
-          playerThreeScore: 0,
-          playerFourScore: 0
-        });
-        this.toggleGameElements();
-      }
 
       toggleGameElements() {
-        this.setState({
-          showGame: !this.state.showGame
-        }) 
+
+        if (this.state.startOrReset == "Start") {
+          this.setState({
+            showGame: !this.state.showGame,
+            startOrReset: "Reset"
+          }) 
+        } else {
+          this.setState({
+            showGame: !this.state.showGame,
+            currentPlayer: 1,
+            playerOneScore: 0,
+            playerTwoScore: 0,
+            playerThreeScore: 0,
+            playerFourScore: 0,
+            startOrReset: "Start"
+          });
+        }
       }
 
       render() {
@@ -265,11 +269,11 @@ class Multiplayer extends Component {
             <div class="form-wrapper3">
                 <h4 style={{textAlign: "center"}}>First to 5 wins!</h4>
                 <h4 style={{textAlign: "center"}}> Player 1: {this.state.playerOneScore} | Player 2: {this.state.playerTwoScore} | Player 3: {this.state.playerThreeScore} | Player 4: {this.state.playerFourScore}</h4>
-                <Button style={{ fontWeight: "bold", textAlign: "center"}} color="primary" onClick={this.toggleGameElements}>Start</Button>
-                <Button style={{ fontWeight: "bold", textAlign: "center"}} color="primary" onClick={this.resetNoModal}>Reset</Button>
+                <div style={{textAlign: "center"}}>
+                  <Button style={{ fontWeight: "bold", textAlign: "center"}} color="primary" onClick={this.toggleGameElements}>{this.state.startOrReset}</Button>
+                </div>
             </div>
             <div class="form-wrapper" id="ge" style={{ display: this.state.showGame ? "block" : "none" }}>
-              <h4 style={{textAlign: "center"}}>Player {this.state.currentPlayer}, you're up!</h4>
               <h3>{this.state.question}</h3>
               <Form>
                   <FormGroup tag="fieldset">
@@ -295,6 +299,8 @@ class Multiplayer extends Component {
                     </FormGroup>
                   </FormGroup>
                   <Button style={{ fontWeight: "bold"}} color="primary" onClick={this.clickSubmit}>{this.state.submitOrNext}</Button>
+                  <br></br>
+                  <h4 style={{textAlign: "center"}}>Player {this.state.currentPlayer}, you're up!</h4>
                 </Form>
                 <Modal isOpen={this.state.modalIsOpen} toggle={this.resetGame}>
                   <ModalBody>
