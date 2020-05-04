@@ -23,6 +23,7 @@ function query(req, res) {
   console.log('querying db...')
   let connection;
   var query = req.body.query
+  console.log(query)
   return connect().then(result => {
     connection = result;
     return executeCmd(connection, query);

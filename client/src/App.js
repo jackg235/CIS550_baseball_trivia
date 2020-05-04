@@ -69,6 +69,10 @@ class App extends Component {
       // get the possible answers for the query
       var arrayRes = results["results"];
       console.log(arrayRes)
+      if (arrayRes.length < 4) {
+        console.log('not enough query results');
+        return this.getRandomQuestion();
+      }
       // create array for 3 other viable choices
       var arr = [];
       while (arr.length < 3) {
@@ -79,12 +83,7 @@ class App extends Component {
       // shuffle results
       var shuffledArray = [arrayRes[0], arrayRes[arr[0]], arrayRes[arr[1]], arrayRes[arr[2]]];
 
-      // if array is 2D make it clean
-     /* if (arrayRes[0].length == 2) {
-        shuffledArray = [arrayRes[0][0] + ', ' + arrayRes[0][1], 
-        arrayRes[arr[0]][0] + ', ' + arrayRes[arr[0]][1], arrayRes[arr[1]][0] + ', ' + arrayRes[arr[1]][1], 
-        arrayRes[arr[2]][0] + ', ' + arrayRes[arr[2]][1]];
-      } */
+
       this.shuffle(shuffledArray);
 
       console.log(shuffledArray);

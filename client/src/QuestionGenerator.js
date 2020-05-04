@@ -48,7 +48,11 @@ class QuestionGenerator {
 				return null
 			}
 			// ignore first few stats (player id, league id, etc.)
-			for (i = numSkip; i < stats2d.length; i++) {
+			var ig = 0
+			if (tableName == 'TEAMS') {
+				ig = 3
+			}
+			for (i = numSkip; i < stats2d.length - ig; i++) {
 				stats.push(stats2d[i][0])
 			}
 
@@ -98,7 +102,7 @@ class QuestionGenerator {
 				'Accept': 'application/json'
 			},
 			body: JSON.stringify({
-				"query": `select distinct name from teams where yearid > date '1960-04-01'`
+				"query": `select distinct name from teams where yearid > date '1980-04-01'`
 			})
 		}).then(res => {
 			return res.json();
@@ -133,8 +137,7 @@ class QuestionGenerator {
 		var collegeIndex = Math.floor(Math.random() * this.college.length);
 		var schoolsIndex = Math.floor(Math.random() * this.schools.length);
 		var playoffBattingIndex = Math.floor(Math.random() * this.playoffBatting.length);
-		var questionIndex = Math.floor(Math.random() * 4);
-
+		var questionIndex = Math.floor(Math.random() * 8);
 		var stat = this.stats[statIndex];
 		var year = this.years[yearIndex];
 		var team = this.teams[teamIndex];
@@ -150,10 +153,10 @@ class QuestionGenerator {
 
 		var question = "";
 		var query = "";
-
+		console.log('QUESTION INDEX ' + questionIndex);
 		switch (questionIndex) {
 			case 0:
-				question = `Who had the most ${playoffB} in the ${year} World Series and what team did he play for?`
+				question = `Who had the most ${playoffB}'s in the ${year} World Series and what team did he play for?`
 				var yrLow = year + '-04-01'
 				year += 1
 				var yrHigh = year + '-04-01'
@@ -191,12 +194,12 @@ class QuestionGenerator {
 					HAVING avg(era) < 4 AND sum(gs) > 50
 				),
 				pitcher_name AS (
-					SELECT nameGiven, team_name, wins
+					SELECT concat(concat(namefirst,' '), namelast) AS full_name, team_name, wins
 					FROM pitcher t 
 					JOIN people p ON t.playerid = p.playerid
 					JOIN decade d ON d.teamID = t.teamID
 				)
-				SELECT team_name, nameGiven
+				SELECT team_name, full_name
 				FROM pitcher_name
 				WHERE rownum < 11
 				ORDER BY wins`
@@ -223,7 +226,7 @@ class QuestionGenerator {
 				return [question, query];
 
 			case 3 :
-				question = `Which team had the most ${teamStat} in a single season since ${year}
+				question = `Which team had the most ${teamStat}'s in a single season since ${year}
 				without winning the world series?`
 				var yr = year + '-04-01'
 				query = `WITH Year AS (
@@ -240,38 +243,35 @@ class QuestionGenerator {
 				return [question, query];
 
 			case 4 :
-				var possibleStats = ['W', 'R', 'H', 'TWOB', 'THREEB', 'HR','SB']
-				var possibleNums = [50, 20, 50, 20, 20, 20, 10]
+				var possibleStats = ['RBI', 'R', 'H', 'TWOB', 'THREEB', 'HR','SB']
+				var possibleNums = [50, 20, 50, 20, 15, 20, 10]
 				var idx = Math.floor(Math.random() * possibleStats.length)
 				var stat = possibleStats[idx]
 				var num = possibleNums[idx]
-				if (year > 1980) {
-					year = year - 40
+				if (year > 1970) {
+					year = year - 60
 				}
-				var yearVal = year + ''
-				question = `What college has produced the most players that:
-				a. have won a WS
-				b. have over 50 hits (some number for some stat)
-				c. have played on at least 2 different teams
-				since 1960 (input year)?`
+				var yearVal = year + '-04-01'
+				question = `What college has produced the most players that have done the following: won a World Series,
+				had over ${num} ${stat}'s , and played on at least 2 different teams since ${year}?`
 				query = `
 				WITH ws_teams AS (
-					SELECT teamid, 
+					SELECT teamid, yearID 
 					FROM teams 
-					WHERE yearID > date '1959-04-01'
+					WHERE yearID > date '${yearVal}'
 					AND wswin = 'Y'
 				),
 				ws_batters AS (
-					SELECT playerid, sum(H), count(distinct b.teamid)
+					SELECT playerid, sum(${stat}), count(distinct b.teamid)
 					FROM batting b
 					JOIN ws_teams w ON b.teamid = w.teamid
 					AND b.yearid = w.yearID
 					GROUP BY playerid
-					HAVING sum(H) > 50
+					HAVING sum(${stat}) > ${num}
 					AND count(distinct b.teamid) > 1
 				),
 				colleges AS (
-					SELECT schoolid, count(w.playerid) AS num
+					SELECT schoolid, count(w.playerid) AS num1
 					FROM ws_batters w 
 					JOIN collegeplaying c ON w.playerid = c.playerid
 					
@@ -280,8 +280,96 @@ class QuestionGenerator {
 				SELECT name_full 
 				FROM colleges c join schools s on c.schoolid = s.schoolid
 				WHERE rownum < 11
-				ORDER BY num DESC`
+				ORDER BY num1 DESC`
 				return [question, query]
+
+			case 5 :
+				question = `Which ${team} pitcher holds the team record for lowest ERA in a season with over 20 games started?`
+				query = `with pitchers AS (
+					SELECT p.playerid, min(p.era) AS min_era
+					from pitching p
+					JOIN teams t ON p.teamid = t.teamid
+					WHERE t.name = '${team}'
+					AND p.gs > 20
+					GROUP BY p.playerid
+					ORDER BY min(p.era)
+				),
+				names AS (
+					SELECT concat(concat(namefirst,' '), namelast) AS full_name
+					FROM pitchers t JOIN people p 
+					ON t.playerid = p.playerid
+					ORDER BY min_era ASC
+				)
+				SELECT full_name from names where rownum < 11`
+				return [question, query]
+
+			case 6 :
+				question = `Which batter has the most career ${bat}'s of all time?`
+				query = `WITH stats as (
+					select playerid, sum(${bat}) AS hrs
+					FROM batting 
+					GROUP BY playerid
+				),
+				names AS (
+					SELECT concat(concat(namefirst,' '), namelast) AS full_name
+					FROM stats s JOIN people p
+					ON s.playerid = p.playerid
+					ORDER BY hrs DESC
+				) 
+				SELECT full_name from names WHERE ROWNUM < 11`
+				return [question, query]
+			
+			case 7 :
+				var decade = parseInt(year / 10, 10) * 10
+				question = `Which of these players has the most ${bat} for any 
+				player born in the ${decade}'s of all time?`
+				var decadeLow = decade + '-04-01'
+				decade += 10
+				var decadeHigh = decade + '-04-01'
+
+				query = `WITH stats as (
+					select concat(concat(namefirst,' '), namelast) AS full_name
+					FROM people p join batting b on p.playerid = b.playerid
+					WHERE birthyear between date '${decadeLow}' and date '${decadeHigh}'
+					ORDER BY ${bat} DESC
+				)
+				select distinct FULL_NAME FROM STATS where rownum < 11`
+				return [question, query]
+
+			case 8 :
+				var high;
+				var low;
+				if (year > 1986) {
+					high = year
+					low = year - 30
+				}
+				else if (year < 1930) {
+					low = year
+					high = year + 30
+				}
+				else {
+					low = year - 15
+					high = year + 15
+				}
+				var ws = 'Y'
+				var ws_string = 'wins'
+				if (Math.random() * 2 == 1) {
+					ws = 'N'
+					ws_string = 'losses'
+				}
+				question = `Which team had the most World Series ${ws_string} between ${low} and ${high}?`
+				low += '-04-01'
+				high += '-04-01'
+				query = `WITH ws_winners as (
+					select name, count(name) 
+					from teams t 
+					WHERE wswin = '${ws}'
+					AND yearid between date '${low}' and date '${high}'
+					GROUP BY NAME
+					order by count(name) desc   
+				)
+				select name FROM ws_winners where rownum < 11`
+				return [question, query];
 
 		}
 
