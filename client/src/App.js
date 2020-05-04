@@ -25,6 +25,7 @@ class App extends Component {
       color2: "black",
       color3: "black",
       result: "Good Luck!",
+      name: "",
       countCorrect: 0,
       countQuestions: 0,
       submitOrNext: "Submit",
@@ -37,6 +38,11 @@ class App extends Component {
     this.modalToggle = this.modalToggle.bind(this);
     this.resetGame = this.resetGame.bind(this);
     this.toggleGameElements = this.toggleGameElements.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(event) {
+    this.setState({value: event.target.value});
   }
 
   async componentDidMount() {
@@ -230,16 +236,18 @@ class App extends Component {
 
   toggleGameElements() {
     this.setState({
+      name: document.getElementById("text").value,
       showGame: !this.state.showGame
     })
   }
-
 
   render() {
     return (
       <div>
         <div class="form-wrapper2">
           <Timer modalToggle={this.modalToggle} toggleGameElements={this.toggleGameElements}/>
+          <br></br>
+          <textarea id={"text"} value={this.state.value} onChange={this.handleChange} rows="1" />
         </div>
         <div class="form-wrapper" id="gameElements" style={ {display: this.state.showGame ? "block" : "none"} }>
             <h3>{this.state.question}</h3>
@@ -271,7 +279,7 @@ class App extends Component {
             </Form>
             <Modal isOpen={this.state.modalIsOpen} toggle={this.resetGame}>
               <ModalBody>
-                You got {this.state.countCorrect} questions correct within the time allotted!
+                {this.state.name}, you got {this.state.countCorrect} questions correct within the time allotted!
               </ModalBody>
               <ModalFooter>
                 <Button onClick={this.resetGame}>Play Again</Button>

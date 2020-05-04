@@ -27,7 +27,7 @@ body:before {
   position: relative;
   display: block;
   width: 1000px;
-  margin: 30px auto;
+  margin: 1px auto;
   padding: 40px;
   border-radius: 5px;
   background-color: rgba(255, 255, 255, 0.95);
@@ -41,7 +41,7 @@ body:before {
   position: relative;
   display: block;
   margin: 0;
-  padding: 20px 0;
+  padding: 5px 0;
   border-top: 1px solid #e6e6e6;
 }
 .form-wrapper form label {
@@ -208,7 +208,7 @@ body:before {
 .form-wrapper3 {
   position: relative;
   display: block;
-  width: 550px;
+  width: 600px;
   margin: 30px auto;
   padding: 10px;
   border-radius: 5px;
