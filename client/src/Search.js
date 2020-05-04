@@ -144,18 +144,22 @@ class Search extends Component {
     let joinTable = this.state.infoFor === "Player" ? "people" : "teams";
     let joinTableAttributes = joinTable === "people" ? "playerId, namegiven" : "teamId, name";
     let joinTableAttributeToShow = joinTable === "people" ? "namegiven AS PlayerName" : "name AS TeamName";
-    // WHERE yearId BETWEEN '${yearToQuery}-01-01' AND '${yearToQuery}-12-31'
-    // where year between date '${yrLow}' and date '${yrHigh}'`
+    
     let query = `
-      SELECT YearID, ${joinTableAttributeToShow}, ${statsToSelect}
-      FROM ${tableToUse}
-      NATURAL JOIN (
-        SELECT ${joinTableAttributes}
-        FROM ${joinTable}
+      SELECT * 
+      FROM (
+        SELECT YearID, ${joinTableAttributeToShow}, ${statsToSelect}
+        FROM ${tableToUse}
+        NATURAL JOIN (
+          SELECT ${joinTableAttributes}
+          FROM ${joinTable}
+        )
+        WHERE yearId ${timeRangeToQuery} date '${yearToQuery}-04-01'
+        ORDER BY ${statsToSelect} ${dataOrderBy}
       )
-      WHERE yearId ${timeRangeToQuery} date '${yearToQuery}-04-01'
-      ORDER BY ${statsToSelect} ${dataOrderBy}
+      WHERE ROWNUM <= 200
     `;
+
     fetch('http://localhost:5000/query', {
       method: 'post',
       headers: {
@@ -239,7 +243,7 @@ class Search extends Component {
             </FormGroup>
 
             <FormGroup row>
-              <Label for="selectPlayerOrTeam" sm={2}>Criteria</Label>
+              <Label for="selectBattingOrPitching" sm={2}>Criteria</Label>
               <Col sm={10}>
                 <Input onChange={this.onDropdownCriteriaSelected} type="select" name="select" id="selectBattingOrPitching">
                   <option key="Batting" value="Batting">Batting</option>
