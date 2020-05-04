@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
-import { Jumbotron, Button, Form, FormGroup, Label, Input, Table, Col } from 'reactstrap';
-const stat_dict = require('./stats.json')
+import { Jumbotron, Button, Form, FormGroup, Label, Input, Col } from 'reactstrap';
+import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
+import BootstrapTable from 'react-bootstrap-table-next';
+import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css';
+import paginationFactory from 'react-bootstrap-table2-paginator';
 
+const stat_dict = require('./stats.json');
 const batting_attributes = ["stint", "G", "AB", "R", "H", "2B", "TWOB", "THREEB", "3B", "HR", "RBI", "SB", "CS", "BB", "SO", "IBB", "HBP", "SH", "SF", "GIDP"];
 const pitching_attributes = ["stint", "W", "L", "G", "GS", "CG", "SHO", "SV", "IPouts", "H", "ER", "HR", "BB", "SO", "BAOpp", "ERA", "IBB", "WP", "HBP", "BK", "BFP", "GF", "R", "SH", "SF", "GIDP"];
 
@@ -9,14 +13,14 @@ class Search extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: null,
+      table: <br />,
       statsToShow: [],
 
       infoFor: "Player",
       criteria: "Batting",
       extreme: "Most",
       stats: "G",
-      timeRange: "in",
+      timeRange: "In",
       year: 1871
     };
 
@@ -29,6 +33,7 @@ class Search extends Component {
     this.onDropdownStatsSelected = this.onDropdownStatsSelected.bind(this);
     this.onDropdownTimeRangeSelected = this.onDropdownTimeRangeSelected.bind(this);
     this.onDropdownYearSelected = this.onDropdownYearSelected.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   componentDidMount() {
@@ -43,7 +48,7 @@ class Search extends Component {
   onDropdownInfoForSelected(e) {
     this.setState({
       infoFor: e.target.value,
-    })
+    });
   }
 
   /**
@@ -72,7 +77,7 @@ class Search extends Component {
     this.setState({
       criteria: e.target.value,
       statsToShow: this.setStats(e.target.value)
-    })
+    });
 
   }
 
@@ -83,7 +88,7 @@ class Search extends Component {
   onDropdownExtremeSelected(e) {
     this.setState({
       extreme: e.target.value
-    })
+    });
   }
 
   /**
@@ -93,7 +98,7 @@ class Search extends Component {
   onDropdownStatsSelected(e) {
     this.setState({
       stats: e.target.value
-    })
+    });
   }
 
   /**
@@ -103,7 +108,7 @@ class Search extends Component {
   onDropdownTimeRangeSelected(e) {
     this.setState({
       timeRange: e.target.value
-    })
+    });
   }
 
   /**
@@ -113,7 +118,7 @@ class Search extends Component {
   onDropdownYearSelected(e) {
     this.setState({
       year: e.target.value
-    })
+    });
   }
 
   /**
@@ -125,6 +130,92 @@ class Search extends Component {
       years.push(<option key={i} value={i}>{i}</option>);
     }
     return years;
+  }
+
+  handleSubmit() {
+    let tableToUse = this.state.criteria === "Batting" ? "batting" : "pitching";
+    let statsToSelect = this.state.stats;
+    let yearToQuery = this.state.year;
+    let timeRangeToQuery = this.state.timeRange === "In" ? "=" :
+      this.state.timeRange === "Since" ? ">=" :
+        "<=";
+    let dataOrderBy = this.state.extreme === "Most" ? "DESC" : "ASC";
+
+    let joinTable = this.state.infoFor === "Player" ? "people" : "teams";
+    let joinTableAttributes = joinTable === "people" ? "playerId, namegiven" : "teamId, name";
+    let joinTableAttributeToShow = joinTable === "people" ? "namegiven AS PlayerName" : "name AS TeamName";
+    // WHERE yearId BETWEEN '${yearToQuery}-01-01' AND '${yearToQuery}-12-31'
+    // where year between date '${yrLow}' and date '${yrHigh}'`
+    let query = `
+      SELECT YearID, ${joinTableAttributeToShow}, ${statsToSelect}
+      FROM ${tableToUse}
+      NATURAL JOIN (
+        SELECT ${joinTableAttributes}
+        FROM ${joinTable}
+      )
+      WHERE yearId ${timeRangeToQuery} date '${yearToQuery}-04-01'
+      ORDER BY ${statsToSelect} ${dataOrderBy}
+    `;
+    fetch('http://localhost:5000/query', {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        "query": query
+      })
+    }).then(res => {
+      return res.json();
+    }, err => {
+      console.log(err);
+    }).then(res => {
+      if (!res) return;
+
+      let tableAttributeDisplay = joinTableAttributeToShow.split(" AS ")[1];
+      const columns = [
+        {
+          dataField: "#",
+          text: "#",
+          sort: true
+        },
+        {
+          dataField: 'Year',
+          text: 'Year',
+          sort: true
+        },
+        {
+          dataField: statsToSelect,
+          text: statsToSelect,
+          sort: true
+        },
+        {
+          dataField: tableAttributeDisplay,
+          text: tableAttributeDisplay,
+          sort: true
+        }
+      ];
+
+      let data = [];
+      for (let i = 0; i < res.results.length; i++) {
+        let rowData = res.results[i];
+        let dataObj = {};
+
+        dataObj['#'] = i;
+        dataObj['Year'] = rowData[0].substring(0, 4);
+        dataObj[tableAttributeDisplay] = rowData[1];
+        dataObj[statsToSelect] = rowData[2];
+
+        data.push(dataObj);
+      }
+
+      return <BootstrapTable keyField='#' data={data} columns={columns} pagination={paginationFactory()} />;
+    }).then(res => {
+      if (!res) return;
+      this.setState({
+        table: res
+      });
+    });
   }
 
   render() {
@@ -198,41 +289,13 @@ class Search extends Component {
 
             <FormGroup row>
               <Col sm={{ size: 10, offset: 2 }}>
-                <Button color="primary">Submit</Button>
+                <Button onClick={this.handleSubmit} color="primary">Submit</Button>
               </Col>
             </FormGroup>
           </Form>
 
-          <Table dark>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Username</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">1</th>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>@mdo</td>
-              </tr>
-              <tr>
-                <th scope="row">2</th>
-                <td>Jacob</td>
-                <td>Thornton</td>
-                <td>@fat</td>
-              </tr>
-              <tr>
-                <th scope="row">3</th>
-                <td>Larry</td>
-                <td>the Bird</td>
-                <td>@twitter</td>
-              </tr>
-            </tbody>
-          </Table>
+          {this.state.table}
+
         </Jumbotron>
       </div>
     );
