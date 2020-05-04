@@ -4,6 +4,7 @@ import './Dashboard.css';
 import App from './App.js';
 import Search from './Search.js';
 import Multiplayer from './MultiPlayer.js';
+import PlayerInfo from './PlayerInfo';
 
 import {
   Navbar,
@@ -47,6 +48,10 @@ class Dashboard extends React.Component {
       tabPage = <Search />;
     }
 
+    if (this.state.tabValue === 3) {
+      tabPage = <PlayerInfo />;
+    }
+
     return (
       <div>
         <Navbar color="light" light expand="md">
@@ -68,6 +73,9 @@ class Dashboard extends React.Component {
             </NavItem>
             <NavItem>
               <NavLink href="#" onClick={() => this.setTabValue(2)}>Search</NavLink>
+            </NavItem>
+            <NavItem>
+              <NavLink href="#" onClick={() => this.setTabValue(3)}>Player Info</NavLink>
             </NavItem>
           </Nav>
           <NavbarText>CIS 450</NavbarText>
