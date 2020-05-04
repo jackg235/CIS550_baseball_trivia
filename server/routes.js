@@ -1,6 +1,5 @@
 const oracledb = require('oracledb');
 const dbConfig = require('./db-config.js')
-const async = require('async')
 
 function connect() {
   return oracledb.getConnection({
@@ -46,6 +45,7 @@ function getLeaderboard(req, res) {
     connection = result;
     return executeCmd(connection, query);
   }).then(result => {
+    console.log(result.rows)
     return result.rows;
   }).then(result => {
     return connection.close().then(() => res.json({'results' : result}));
@@ -68,10 +68,11 @@ function addToLeaderboard(req, res) {
     return result.rows;
   }).then(result => {
     deleteLastPlace() // delete the person ranked 10th on the ldeaderboard
-    return connection.close().then(() => res.json({'results' : result}));
+    return connection.close().then(() => res.json({'success' : true}));
   }).catch(error => {
     console.log('ERROR executing query: ' + query)
     console.log(error)
+    res.json({'success' : false})
   })
 }
 

@@ -47,6 +47,7 @@ class App extends Component {
 
   async componentDidMount() {
     this.getRandomQuestion()
+    this.getLeaderboard()
   }
 
   shuffle(a) {
@@ -126,11 +127,43 @@ class App extends Component {
           correctIndex: correctIndex
         })
       }
-
     }, err => {
       // Print the error if there is one.
       console.log(err);
     });
+  }
+
+  getLeaderboard() {
+    fetch('http://localhost:5000/leaderboard', {
+      method: 'get',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    }).then(res => {
+      return res.json();
+    }, err => {
+      console.log(err);
+    }).then(results => {
+      if (!results) return;
+      this.setState({
+        leaderboard: results['results']
+      });
+    })
+  }
+
+  addToLeaderboard(name, score) {
+    fetch('http://localhost:5000/addLeaderboard', {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        "name": name,
+        "score":score
+      })
+    })
   }
 
   clickSubmit() {
