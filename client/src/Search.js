@@ -209,7 +209,7 @@ class Search extends Component {
         data.push(dataObj);
       }
 
-      return <BootstrapTable keyField='#' data={data} columns={columns} pagination={paginationFactory()} />;
+      return <BootstrapTable keyField='#' data={data} columns={columns} hover = {true} pagination={paginationFactory()} />;
     }).then(res => {
       if (!res) return;
       this.setState({
