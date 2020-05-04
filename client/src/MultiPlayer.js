@@ -19,6 +19,10 @@ class Multiplayer extends Component {
           choice1: "",
           choice2: "",
           choice3: "",
+          color0: "black",
+          color1: "black",
+          color2: "black",
+          color3: "black",
           result: "Good Luck!",
           currentPlayer: 1,
           playerOneScore: 0,
@@ -26,6 +30,7 @@ class Multiplayer extends Component {
           playerThreeScore: 0,
           playerFourScore: 0,
           targetScore: 3,
+          submitOrNext: "Submit",
           modalIsOpen: false
         };
     
@@ -121,38 +126,88 @@ class Multiplayer extends Component {
       }
 
       clickSubmit() {
-        var anythingChecked = document.getElementById("a0").checked || (
-          document.getElementById("a1").checked) || (
-            document.getElementById("a2").checked) || (
-            document.getElementById("a3").checked);
-    
-        if (anythingChecked) {
-          var correctChecked = document.getElementById("a" + this.state.correctIndex).checked;
-          if (correctChecked) {
-            this.setState({
-              result: "Correct!",
-              playerOneScore: this.state.currentPlayer === 1 ? this.state.playerOneScore + 1 : this.state.playerOneScore,
-              playerTwoScore: this.state.currentPlayer === 2 ? this.state.playerTwoScore + 1 : this.state.playerTwoScore,
-              playerThreeScore: this.state.currentPlayer === 3 ? this.state.playerThreeScore + 1 : this.state.playerThreeScore,
-              playerFourScore: this.state.currentPlayer === 4 ? this.state.playerFourScore + 1 : this.state.playerFourScore
-            });
-            if ((this.state.currentPlayer === 1 && this.state.playerOneScore === (this.state.targetScore - 1)) || 
-                (this.state.currentPlayer === 2 && this.state.playerTwoScore === (this.state.targetScore - 1)) ||
-                (this.state.currentPlayer === 3 && this.state.playerThreeScore === (this.state.targetScore - 1)) ||
-                (this.state.currentPlayer === 4 && this.state.playerFourScore === (this.state.targetScore - 1))) {
-                    this.modalToggle();
-                }
+        if (this.state.submitOrNext == "Submit") {
+          var anythingChecked = document.getElementById("a0").checked || (
+            document.getElementById("a1").checked) || (
+              document.getElementById("a2").checked) || (
+              document.getElementById("a3").checked);
+      
+          if (anythingChecked) {
+            var correctChecked = document.getElementById("a" + this.state.correctIndex).checked;
+            if (correctChecked) {
+              this.setState({
+                result: "Correct!",
+                playerOneScore: this.state.currentPlayer === 1 ? this.state.playerOneScore + 1 : this.state.playerOneScore,
+                playerTwoScore: this.state.currentPlayer === 2 ? this.state.playerTwoScore + 1 : this.state.playerTwoScore,
+                playerThreeScore: this.state.currentPlayer === 3 ? this.state.playerThreeScore + 1 : this.state.playerThreeScore,
+                playerFourScore: this.state.currentPlayer === 4 ? this.state.playerFourScore + 1 : this.state.playerFourScore,
+                submitOrNext: "Next Question",
+                color0: "red",
+                color1: "red",
+                color2: "red",
+                color3: "red"
+              });
+              if ((this.state.currentPlayer === 1 && this.state.playerOneScore === (this.state.targetScore - 1)) || 
+                  (this.state.currentPlayer === 2 && this.state.playerTwoScore === (this.state.targetScore - 1)) ||
+                  (this.state.currentPlayer === 3 && this.state.playerThreeScore === (this.state.targetScore - 1)) ||
+                  (this.state.currentPlayer === 4 && this.state.playerFourScore === (this.state.targetScore - 1))) {
+                      this.modalToggle();
+                  }
+            } else {
+              this.setState({
+                result: "Incorrect (" + this.state.correctAnswer + ")",
+                countQuestions: this.state.countQuestions + 1,
+                submitOrNext: "Next Question",
+                color0: "red",
+                color1: "red",
+                color2: "red",
+                color3: "red",
+              });
+            }
           }
-        }
-        this.setState({
-            currentPlayer: this.state.currentPlayer === 4 ? 1 : this.state.currentPlayer + 1
-        });
+          this.setState({
+              currentPlayer: this.state.currentPlayer === 4 ? 1 : this.state.currentPlayer + 1
+          });
+
+          switch (this.state.correctIndex) {
+            case 0:
+              this.setState({
+                color0: "green"
+              });
+              break;
+            case 1:
+              this.setState({
+                color1: "green"
+              });
+              break;
+            case 2:
+              this.setState({
+                color2: "green"
+              });
+              break;
+            case 3:
+              this.setState({
+                color3: "green"
+              });
+              break;
+            default:
+              break;
+          }
+        } else {
           this.getRandomQuestion();
           document.getElementById("a0").checked = false;
           document.getElementById("a1").checked = false;
           document.getElementById("a2").checked = false;
           document.getElementById("a3").checked = false;
-        
+          this.setState({
+            submitOrNext: "Submit",
+            result: "",
+            color0: "black",
+            color1: "black",
+            color2: "black",
+            color3: "black",
+          });
+        }
       }
 
       callBackendAPI = async () => {
@@ -186,52 +241,47 @@ class Multiplayer extends Component {
       render() {
           return (
             <div>
-            <Jumbotron>
+            <div class="form-wrapper3">
+                <h4 style={{textAlign: "center"}}>First to 5 wins!</h4>
+                <h4 style={{textAlign: "center"}}> Player 1: {this.state.playerOneScore} | Player 2: {this.state.playerTwoScore} | Player 3: {this.state.playerThreeScore} | Player 4: {this.state.playerFourScore}</h4>
+            </div>
+            <div class="form-wrapper">
+              <h4 style={{textAlign: "center"}}>Player {this.state.currentPlayer}, you're up!</h4>
+              <h3>{this.state.question}</h3>
               <Form>
-                  <h4>Mulitplayer Trivia</h4>
-                  <h4>First to 5 wins!</h4>
-                  <h4>Player 1: {this.state.playerOneScore}</h4>
-                  <h4>Player 2: {this.state.playerTwoScore}</h4>
-                  <h4>Player 3: {this.state.playerThreeScore}</h4>
-                  <h4>Player 4: {this.state.playerFourScore}</h4>
-                  <h4>Player {this.state.currentPlayer}, you're up!</h4>
-                <FormGroup tag="fieldset">
-                  <h3>{this.state.question}</h3>
-                  <FormGroup check>
-                    <Label check>
-                      <Input id="a0" type="radio" name="answer" value="0" />{this.state.choice0}
-                    </Label>
+                  <FormGroup tag="fieldset">
+                    <FormGroup check>
+                      <Label check style={{ color: this.state.color0, fontSize: 22}}>
+                        <Input id="a0" type="radio" name="answer" value="0"/>{this.state.choice0}
+                      </Label>
+                    </FormGroup>
+                    <FormGroup check>
+                      <Label check style={{ color: this.state.color1, fontSize: 22}}>
+                        <Input id="a1" type="radio" name="answer" value="1" />{this.state.choice1}
+                      </Label>
+                    </FormGroup>
+                    <FormGroup check style={{ color: this.state.color2, fontSize: 22}}>
+                      <Label check>
+                        <Input id="a2" type="radio" name="answer" value="2" />{this.state.choice2}
+                      </Label>
+                    </FormGroup>
+                    <FormGroup check>
+                      <Label check style={{ color: this.state.color3, fontSize: 22}}>
+                        <Input id="a3" type="radio" name="answer" value="3" />{this.state.choice3}
+                      </Label>
+                    </FormGroup>
                   </FormGroup>
-                  <FormGroup check>
-                    <Label check>
-                      <Input id="a1" type="radio" name="answer" value="1" />{this.state.choice1}
-                    </Label>
-                  </FormGroup>
-                  <FormGroup check>
-                    <Label check>
-                      <Input id="a2" type="radio" name="answer" value="2" />{this.state.choice2}
-                    </Label>
-                  </FormGroup>
-                  <FormGroup check>
-                    <Label check>
-                      <Input id="a3" type="radio" name="answer" value="3" />{this.state.choice3}
-                    </Label>
-                  </FormGroup>
-                </FormGroup>
-                <Button color="primary" onClick={this.clickSubmit}>Submit</Button>
-                <br />
-                <br />
-                <h4>{this.state.result}</h4>
-            </Form>
-            </Jumbotron>
-            <Modal isOpen={this.state.modalIsOpen} toggle={this.resetGame}>
-                <ModalBody>
-                    Congratulations Player {this.state.currentPlayer - 1}, you won!
-                </ModalBody>
-                <ModalFooter>
-                    <Button onClick={this.resetGame}>Play Again</Button>
-                </ModalFooter>
-            </Modal>
+                  <Button style={{ fontWeight: "bold"}} color="primary" onClick={this.clickSubmit}>{this.state.submitOrNext}</Button>
+                </Form>
+                <Modal isOpen={this.state.modalIsOpen} toggle={this.resetGame}>
+                  <ModalBody>
+                      Congratulations Player {this.state.currentPlayer - 1}, you won!
+                  </ModalBody>
+                  <ModalFooter>
+                      <Button onClick={this.resetGame}>Play Again</Button>
+                  </ModalFooter>
+              </Modal>
+              </div>
           </div>
           );
       }

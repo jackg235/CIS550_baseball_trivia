@@ -239,22 +239,22 @@ class App extends Component {
           <Form>
               <FormGroup tag="fieldset">
                 <FormGroup check>
-                  <Label check style={{ color: this.state.color0, fontWeight: "bold"}}>
+                  <Label check style={{ color: this.state.color0, fontSize: 22}}>
                     <Input id="a0" type="radio" name="answer" value="0"/>{this.state.choice0}
                   </Label>
                 </FormGroup>
                 <FormGroup check>
-                  <Label check style={{ color: this.state.color1, fontWeight: "bold"}}>
+                  <Label check style={{ color: this.state.color1, fontSize: 22}}>
                     <Input id="a1" type="radio" name="answer" value="1" />{this.state.choice1}
                   </Label>
                 </FormGroup>
-                <FormGroup check style={{ color: this.state.color2, fontWeight: "bold"}}>
+                <FormGroup check style={{ color: this.state.color2, fontSize: 22}}>
                   <Label check>
                     <Input id="a2" type="radio" name="answer" value="2" />{this.state.choice2}
                   </Label>
                 </FormGroup>
                 <FormGroup check>
-                  <Label check style={{ color: this.state.color3, fontWeight: "bold"}}>
+                  <Label check style={{ color: this.state.color3, fontSize: 22}}>
                     <Input id="a3" type="radio" name="answer" value="3" />{this.state.choice3}
                   </Label>
                 </FormGroup>
