@@ -15,6 +15,7 @@ class App extends Component {
       question: "",
       query: "",
       correctIndex: 0,
+      correctAnswer: "",
       choice0: "",
       choice1: "",
       choice2: "",
@@ -83,7 +84,6 @@ class App extends Component {
       // shuffle results
       var shuffledArray = [arrayRes[0], arrayRes[arr[0]], arrayRes[arr[1]], arrayRes[arr[2]]];
 
-
       this.shuffle(shuffledArray);
 
       console.log(shuffledArray);
@@ -92,6 +92,7 @@ class App extends Component {
 
       if (shuffledArray[0].length == 2) {
         this.setState({
+          correctAnswer: arrayRes[0][0] + ", " + shuffledArray[0][1],
           question: questionRes,
           query: queryRes,
           choice0: shuffledArray[0][0] + ", " + shuffledArray[0][1],
@@ -102,6 +103,7 @@ class App extends Component {
         })
       } else {
         this.setState({
+          correctAnswer: arrayRes[0],
           question: questionRes,
           query: queryRes,
           choice0: shuffledArray[0],
@@ -135,7 +137,7 @@ class App extends Component {
 
       } else {
         this.setState({
-          result: "Incorrect",
+          result: "Incorrect (" + this.state.correctAnswer + ")",
           countQuestions: this.state.countQuestions + 1
         });
       }
