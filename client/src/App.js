@@ -20,9 +20,14 @@ class App extends Component {
       choice1: "",
       choice2: "",
       choice3: "",
+      color0: "black",
+      color1: "black",
+      color2: "black",
+      color3: "black",
       result: "Good Luck!",
       countCorrect: 0,
       countQuestions: 0,
+      submitOrNext: "Submit",
       modalIsOpen: false
     };
     this.getRandomQuestion = this.getRandomQuestion.bind(this);
@@ -121,31 +126,78 @@ class App extends Component {
   }
 
   clickSubmit() {
-    var anythingChecked = document.getElementById("a0").checked || (
-      document.getElementById("a1").checked) || (
-        document.getElementById("a2").checked) || (
-        document.getElementById("a3").checked);
+    if (this.state.submitOrNext == "Submit") {
+      var anythingChecked = document.getElementById("a0").checked || (
+        document.getElementById("a1").checked) || (
+          document.getElementById("a2").checked) || (
+          document.getElementById("a3").checked);
 
-    if (anythingChecked) {
-      var correctChecked = document.getElementById("a" + this.state.correctIndex).checked;
-      if (correctChecked) {
-        this.setState({
-          result: "Correct!",
-          countCorrect: this.state.countCorrect + 1,
-          countQuestions: this.state.countQuestions + 1
-        });
+      if (anythingChecked) {
+        var correctChecked = document.getElementById("a" + this.state.correctIndex).checked;
+        if (correctChecked) {
+          this.setState({
+            result: "Correct!",
+            countCorrect: this.state.countCorrect + 1,
+            countQuestions: this.state.countQuestions + 1,
+            submitOrNext: "Next Question",
+            color0: "red",
+            color1: "red",
+            color2: "red",
+            color3: "red",
+          });
 
-      } else {
-        this.setState({
-          result: "Incorrect (" + this.state.correctAnswer + ")",
-          countQuestions: this.state.countQuestions + 1
-        });
+        } else {
+          this.setState({
+            result: "Incorrect (" + this.state.correctAnswer + ")",
+            countQuestions: this.state.countQuestions + 1,
+            submitOrNext: "Next Question",
+            color0: "red",
+            color1: "red",
+            color2: "red",
+            color3: "red",
+          });
+        }
+
+        switch (this.state.correctIndex) {
+          case 0:
+            this.setState({
+              color0: "green"
+            });
+            break;
+          case 1:
+            this.setState({
+              color1: "green"
+            });
+            break;
+          case 2:
+            this.setState({
+              color2: "green"
+            });
+            break;
+          case 3:
+            this.setState({
+              color3: "green"
+            });
+            break;
+          default:
+            break;
+        }
+
       }
+    } else {
       this.getRandomQuestion();
       document.getElementById("a0").checked = false;
       document.getElementById("a1").checked = false;
       document.getElementById("a2").checked = false;
       document.getElementById("a3").checked = false;
+      this.setState({
+        submitOrNext: "Submit",
+        result: "",
+        color0: "black",
+        color1: "black",
+        color2: "black",
+        color3: "black",
+      });
     }
   }
 
@@ -179,48 +231,47 @@ class App extends Component {
   render() {
     return (
       <div>
-        <Jumbotron>
+        <div class="form-wrapper2">
+          <Timer modalToggle={this.modalToggle} />
+        </div>
+        <div class="form-wrapper">
+          <h3>{this.state.question}</h3>
           <Form>
-            <FormGroup tag="fieldset">
-              <h3>{this.state.question}</h3>
-              <FormGroup check>
-                <Label check>
-                  <Input id="a0" type="radio" name="answer" value="0" />{this.state.choice0}
-                </Label>
+              <FormGroup tag="fieldset">
+                <FormGroup check>
+                  <Label check style={{ color: this.state.color0, fontWeight: "bold"}}>
+                    <Input id="a0" type="radio" name="answer" value="0"/>{this.state.choice0}
+                  </Label>
+                </FormGroup>
+                <FormGroup check>
+                  <Label check style={{ color: this.state.color1, fontWeight: "bold"}}>
+                    <Input id="a1" type="radio" name="answer" value="1" />{this.state.choice1}
+                  </Label>
+                </FormGroup>
+                <FormGroup check style={{ color: this.state.color2, fontWeight: "bold"}}>
+                  <Label check>
+                    <Input id="a2" type="radio" name="answer" value="2" />{this.state.choice2}
+                  </Label>
+                </FormGroup>
+                <FormGroup check>
+                  <Label check style={{ color: this.state.color3, fontWeight: "bold"}}>
+                    <Input id="a3" type="radio" name="answer" value="3" />{this.state.choice3}
+                  </Label>
+                </FormGroup>
               </FormGroup>
-              <FormGroup check>
-                <Label check>
-                  <Input id="a1" type="radio" name="answer" value="1" />{this.state.choice1}
-                </Label>
-              </FormGroup>
-              <FormGroup check>
-                <Label check>
-                  <Input id="a2" type="radio" name="answer" value="2" />{this.state.choice2}
-                </Label>
-              </FormGroup>
-              <FormGroup check>
-                <Label check>
-                  <Input id="a3" type="radio" name="answer" value="3" />{this.state.choice3}
-                </Label>
-              </FormGroup>
-            </FormGroup>
-            <Button color="primary" onClick={this.clickSubmit}>Submit</Button>
-            <Timer modalToggle={this.modalToggle} />
-            <br />
-            <br />
-            <h4>{this.state.result}</h4>
-            <h4>{this.state.countCorrect} for {this.state.countQuestions}! ({(100 * this.state.countCorrect / (this.state.countQuestions + 0.0000000001)).toFixed(1)}%)</h4>
-          </Form>
-        </Jumbotron>
-        <Modal isOpen={this.state.modalIsOpen} toggle={this.resetGame}>
-            <ModalBody>
-              You got {this.state.countCorrect} questions correct within the time allotted!
-            </ModalBody>
-            <ModalFooter>
-              <Button onClick={this.resetGame}>Play Again</Button>
-            </ModalFooter>
-        </Modal>
-      </div>
+              <Button style={{ fontWeight: "bold"}} color="primary" onClick={this.clickSubmit}>{this.state.submitOrNext}</Button>
+              <h4 style={{textAlign: "right", fontStyle: "italic"}}>{this.state.countCorrect} for {this.state.countQuestions}! ({(100 * this.state.countCorrect / (this.state.countQuestions + 0.0000000001)).toFixed(1)}%)</h4>
+            </Form>
+            <Modal isOpen={this.state.modalIsOpen} toggle={this.resetGame}>
+              <ModalBody>
+                You got {this.state.countCorrect} questions correct within the time allotted!
+              </ModalBody>
+              <ModalFooter>
+                <Button onClick={this.resetGame}>Play Again</Button>
+              </ModalFooter>
+          </Modal>
+          </div>
+        </div>
     );
   }
 }

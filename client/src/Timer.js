@@ -43,7 +43,8 @@ class Timer extends Component {
         }
       }
     
-      startCountDown() {
+    startCountDown() {
+        
         this.setState({
             minutes: '01',
             seconds: '00'
@@ -52,20 +53,14 @@ class Timer extends Component {
             clearInterval(this.intervalHandle);
         } 
         this.intervalHandle = setInterval(this.tick, 1000);
-      }
+    }
 
     render() {
         return (
             <div>
-                <div>
-                    <h1 style={{ fontSize: 100, marginLeft:100}}>
-                        {this.state.minutes}:{this.state.seconds}
-                    </h1>
-                </div>
-                <div >
-                    <Button onClick={this.startCountDown}>Start</Button>
-                </div>
+                <h1 style={{margin: "0", display: "inline-block"}}>{this.state.minutes}:{this.state.seconds}</h1>  <Button style={{float: "right"}} onClick={this.startCountDown}>Start</Button>
             </div>
+            
         );
     }
 }

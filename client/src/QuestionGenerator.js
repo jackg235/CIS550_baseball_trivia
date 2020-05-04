@@ -22,7 +22,6 @@ class QuestionGenerator {
 		this.getStats('TEAMS', 5);
 		this.getStats('PLAYOFFBATTING', 3);
 		this.getStats('SCHOOLS', 0); 
-		
 	}
 
 	getStats(tableName, numSkip) {
@@ -176,7 +175,7 @@ class QuestionGenerator {
 				var caseStat = possibleStats[Math.floor(Math.random() * possibleStats.length)];
 
 				var decade = parseInt(year / 10, 10) * 10
-				question = `In the ${decade}'s, which team had the most ${this.json[caseStat]}'s in the MLB with a pitcher 
+				question = `In the ${decade}'s, which team had the most ${this.json[caseStat]} in the MLB with a pitcher 
 				who started over 50 games with an average ERA of less than 4? Who was that pitcher?`
 				console.log(decade)
 				var decadeLow = decade + '-04-01'
@@ -255,7 +254,7 @@ class QuestionGenerator {
 				}
 				var yearVal = year + '-04-01'
 				question = `What college has produced the most players that have done the following: won a World Series,
-				had over ${num} ${stat}'s , and played on at least 2 different teams since ${year}?`
+				had over ${num} ${this.json[stat]}, and played on at least 2 different teams since ${year}?`
 				query = `
 				WITH ws_teams AS (
 					SELECT teamid, yearID 
@@ -306,7 +305,7 @@ class QuestionGenerator {
 				return [question, query]
 
 			case 6 :
-				question = `Which batter has the most career ${bat}'s of all time?`
+				question = `Which batter has the most career ${this.json[bat]} of all time?`
 				query = `WITH stats as (
 					select playerid, sum(${bat}) AS hrs
 					FROM batting 
@@ -323,7 +322,7 @@ class QuestionGenerator {
 			
 			case 7 :
 				var decade = parseInt(year / 10, 10) * 10
-				question = `Which of these players has the most ${bat} for any 
+				question = `Which of these players has the most ${this.json[bat]} for any 
 				player born in the ${decade}'s of all time?`
 				var decadeLow = decade + '-04-01'
 				decade += 10
@@ -375,12 +374,8 @@ class QuestionGenerator {
 
 		}
 
-
-		// return dummies for now bc queries r incorrect
-		var dummyQuestion = `Year: ${year}, Team: ${team}, TeamStat: ${teamStat}, BattingStats: ${bat}, PitchingStates: ${pitch}, Person: ${person}, College: ${col}, School: ${schl}, Playoffs: ${playoffB}`;
-		var dummyQuery =  'select nameGiven from People where rownum < 11';
-		return [dummyQuestion, dummyQuery];
-
+		// UNUSED QUERIES TO ADD LATER
+		/*
 		switch (questionIndex) {
 			case 0:
 				question = `Which player had the most ${stat} in ${year}?`;
@@ -461,6 +456,7 @@ class QuestionGenerator {
 			default:
 
 		}
+		*/
 	}
 }
 export default QuestionGenerator;
