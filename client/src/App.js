@@ -324,7 +324,7 @@ class App extends Component {
           </Modal>
           </div>
 
-          <div class="form-wrapper4">
+          <div style={ {display: !this.state.showGame ? "block" : "none"}} class="form-wrapper4" >
             <table style={{width:"100%", textAlign: "center"}}>
               <tr>
                 <th>Rank</th>
