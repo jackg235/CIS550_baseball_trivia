@@ -40,6 +40,7 @@ class Timer extends Component {
         if (min === 0 & sec === 0) {
         clearInterval(this.intervalHandle);
         this.props.modalToggle();
+        this.props.addToLeaderboard();
         }
       }
     

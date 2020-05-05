@@ -25,6 +25,7 @@ class App extends Component {
       color2: "black",
       color3: "black",
       result: "Good Luck!",
+      leaderboard: [["-", 0],["-", 0],["-", 0],["-", 0],["-", 0],["-", 0],["-", 0],["-", 0],["-", 0],["-", 0]],
       name: "",
       countCorrect: 0,
       countQuestions: 0,
@@ -39,6 +40,7 @@ class App extends Component {
     this.resetGame = this.resetGame.bind(this);
     this.toggleGameElements = this.toggleGameElements.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.addToLeaderboard = this.addToLeaderboard.bind(this)
   }
 
   handleChange(event) {
@@ -146,13 +148,14 @@ class App extends Component {
       console.log(err);
     }).then(results => {
       if (!results) return;
+      console.log(results['results']);
       this.setState({
         leaderboard: results['results']
       });
     })
   }
 
-  addToLeaderboard(name, score) {
+  addToLeaderboard() {
     fetch('http://localhost:5000/addLeaderboard', {
       method: 'post',
       headers: {
@@ -160,10 +163,11 @@ class App extends Component {
         'Accept': 'application/json'
       },
       body: JSON.stringify({
-        "name": name,
-        "score":score
+        "name": this.state.name,
+        "score": this.state.countCorrect
       })
     })
+    this.getLeaderboard();
   }
 
   clickSubmit() {
@@ -278,7 +282,7 @@ class App extends Component {
     return (
       <div>
         <div class="form-wrapper2">
-          <Timer modalToggle={this.modalToggle} toggleGameElements={this.toggleGameElements}/>
+          <Timer modalToggle={this.modalToggle} toggleGameElements={this.toggleGameElements} addToLeaderboard={this.addToLeaderboard}/>
           <br></br>
           <textarea id={"text"} value={this.state.value} onChange={this.handleChange} rows="1" />
         </div>
@@ -312,12 +316,72 @@ class App extends Component {
             </Form>
             <Modal isOpen={this.state.modalIsOpen} toggle={this.resetGame}>
               <ModalBody>
-                {this.state.name}, you got {this.state.countCorrect} questions correct within the time allotted!
+                {this.state.name}, you got {this.state.countCorrect} questions correct within the time allotted! 
               </ModalBody>
               <ModalFooter>
-                <Button onClick={this.resetGame}>Play Again</Button>
+                <Button onClick={this.resetGame}>Close</Button>
               </ModalFooter>
           </Modal>
+          </div>
+
+          <div class="form-wrapper4">
+            <table style={{width:"100%", textAlign: "center"}}>
+              <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Score</th>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>{this.state.leaderboard[0][0]}</td>
+                <td>{this.state.leaderboard[0][1]}</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>{this.state.leaderboard[1][0]}</td>
+                <td>{this.state.leaderboard[1][1]}</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>{this.state.leaderboard[2][0]}</td>
+                <td>{this.state.leaderboard[2][1]}</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>{this.state.leaderboard[3][0]}</td>
+                <td>{this.state.leaderboard[3][1]}</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>{this.state.leaderboard[4][0]}</td>
+                <td>{this.state.leaderboard[4][1]}</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>{this.state.leaderboard[5][0]}</td>
+                <td>{this.state.leaderboard[5][1]}</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td>{this.state.leaderboard[6][0]}</td>
+                <td>{this.state.leaderboard[6][1]}</td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td>{this.state.leaderboard[7][0]}</td>
+                <td>{this.state.leaderboard[7][1]}</td>
+              </tr>
+              <tr>
+                <td>9</td>
+                <td>{this.state.leaderboard[8][0]}</td>
+                <td>{this.state.leaderboard[8][1]}</td>
+              </tr>
+              <tr>
+                <td>10</td>
+                <td>{this.state.leaderboard[9][0]}</td>
+                <td>{this.state.leaderboard[9][1]}</td>
+              </tr>
+            </table>
           </div>
         </div>
     );

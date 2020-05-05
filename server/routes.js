@@ -63,7 +63,7 @@ function addToLeaderboard(req, res) {
   var query = `insert into leaderboard values ('${name}', ${score})`
   return connect().then(result => {
     connection = result;
-    return executeCmd(connection, query);
+    return connection.execute(query, [], {autoCommit: true});
   }).then(result => {
     return result.rows;
   }).then(result => {
@@ -81,14 +81,12 @@ function deleteLastPlace() {
   let connection;
   var query = `DELETE FROM leaderboard
                 WHERE score = (SELECT MIN(score) FROM leaderboard) and
-                rownum = 1;`
+                rownum = 1`;
   return connect().then(result => {
     connection = result;
-    return executeCmd(connection, query);
+    return connection.execute(query, [], {autoCommit: true});
   }).then(result => {
-    return result.rows;
-  }).then(result => {
-    return connection.close().then(() => res.json({'results' : result}));
+    return connection.close;
   }).catch(error => {
     console.log('ERROR executing query: ' + query)
     console.log(error)
