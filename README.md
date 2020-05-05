@@ -7,3 +7,5 @@ In order to run the application for this project, open two terminal windows. Tab
 - A page to lookup players based on their names
 
 There pages can be tabbed between by the dashboard at the top of the page.
+
+In order to run this application, make sure that Node is downgraded to version 12.16.1. Additionally, be sure to run npm install in both the server and client folders in order to download all necessary packages.
