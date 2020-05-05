@@ -1,5 +1,7 @@
+// Class to randomly generate a question on demand
 class QuestionGenerator {
 
+	// Initialize variables in case the queries do not return in time
 	stats = ['HR'];
 	years = ['2004', '1920', '1987'];
 	teams = ["Philadelphia Phillies", "New York Mets", "Pittsburgh Pirates"];
@@ -12,6 +14,7 @@ class QuestionGenerator {
 	playoffBatting = ['H']
 	json = require('./stats.json');
 
+	// Get all of the posible field values upon construction
 	constructor() {
 		this.getTeamOptions();
 		this.years = this.getYearOptions();
@@ -24,6 +27,7 @@ class QuestionGenerator {
 		this.getStats('SCHOOLS', 0); 
 	}
 
+	// Pull the possible stat columns from the tables
 	getStats(tableName, numSkip) {
 		console.log('getting stats for ' + tableName)
 		fetch('http://localhost:5000/query', {
@@ -48,7 +52,7 @@ class QuestionGenerator {
 				console.log('error retrieving table ' + tableName)
 				return null
 			}
-			// ignore first few stats (player id, league id, etc.)
+			// Ignore first few stats (player id, league id, etc.)
 			var ig = 0
 			if (tableName == 'TEAMS') {
 				ig = 5
@@ -57,6 +61,7 @@ class QuestionGenerator {
 				stats.push(stats2d[i][0])
 			}
 
+			// Store in the proper variable based on the table
 			switch (tableName) {
 				case 'BATTING':
 					this.battingStats = stats;
@@ -86,6 +91,7 @@ class QuestionGenerator {
 		})
 	}
 
+	// Return all years from 1900 to the present
 	getYearOptions() {
 		var output = [];
 		for (var i = 1900; i < 2019; i++) {
@@ -94,6 +100,7 @@ class QuestionGenerator {
 		return output;
 	}
 
+	// Pull all the possible teams
 	getTeamOptions() {
 		console.log('getting team options...')
 		fetch('http://localhost:5000/query', {
@@ -127,7 +134,10 @@ class QuestionGenerator {
 		})
 	}
 
+	// Generate a question based off the generated values and randomization
 	generateQuestion() {
+
+		// Get a random index for each type of fill in the blank
 		var statIndex = Math.floor(Math.random() * this.stats.length);
 		var yearIndex = Math.floor(Math.random() * this.years.length);
 		var teamIndex = Math.floor(Math.random() * this.teams.length);
@@ -139,6 +149,8 @@ class QuestionGenerator {
 		var schoolsIndex = Math.floor(Math.random() * this.schools.length);
 		var playoffBattingIndex = Math.floor(Math.random() * this.playoffBatting.length);
 		var questionIndex = Math.floor(Math.random() * 8);
+
+		// Get the associated value
 		var stat = this.stats[statIndex];
 		var year = this.years[yearIndex];
 		var team = this.teams[teamIndex];
@@ -150,8 +162,8 @@ class QuestionGenerator {
 		var schl = this.schools[schoolsIndex];
 		var playoffB = this.playoffBatting[playoffBattingIndex];
 
-		console.log(this.playoffBatting)
-
+		// Choose a random question template and fill in the values, 
+		// Return the English question and SQL query
 		var question = "";
 		var query = "";
 		console.log('QUESTION INDEX ' + questionIndex);
@@ -373,90 +385,6 @@ class QuestionGenerator {
 				return [question, query];
 
 		}
-
-		// UNUSED QUERIES TO ADD LATER
-		/*
-		switch (questionIndex) {
-			case 0:
-				question = `Which player had the most ${stat} in ${year}?`;
-				query = `WITH Stat AS (` +
-					`SELECT name, ${stat}` +
-					` FROM Batting` +
-					` WHERE yearID == ${year}` +
-					`SELECT name, MAX(${stat})` +
-					` FROM Stat` +
-					` GROUP BY ${stat}` +
-					` HAVING ROWNUM == 1`;
-				return [question, query];
-			case 1:
-				question = `Which player had the fewest ${stat} in ${year}?`;
-				query = `WITH Stat AS (` +
-					`SELECT name, ${stat}` +
-					` FROM Batting` +
-					` WHERE yearID == ${year}` +
-					`SELECT name, MIN(${stat})` +
-					` FROM Stat` +
-					` GROUP BY ${stat}` +
-					` HAVING ROWNUM == 1`;
-
-				return [question, query];
-			case 2:
-				question = `Which pitcher had the most ${stat} in ${year}?`;
-				query = `WITH Stat AS (` +
-					`SELECT name, ${stat}` +
-					` FROM Pitching` +
-					` WHERE yearID == ${year})` +
-					`SELECT name, MAX(${stat})` +
-					` FROM Stat` +
-					` GROUP BY ${stat}` +
-					` HAVING ROWNUM == 1`;
-
-				return [question, query];
-			case 3:
-				question = `Which pitcher had the fewest ${stat} in ${year}?`;
-				query = `WITH Stat AS (` +
-					`SELECT name, ${stat}` +
-					` FROM Pitching` +
-					` WHERE yearID == ${year}` +
-					`SELECT name, MIN(${stat})` +
-					` FROM Stat` +
-					` GROUP BY ${stat}` +
-					` HAVING ROWNUM == 1`;
-
-				return [question, query];
-			case 4:
-				question = `Which ${team} player holds the team record for the most ${stat} in a World Series?`;
-				query = `SELECT name, MAX(${stat})` +
-					` FROM world_series_batting` +
-					` WHERE TEAM = ${team}` +
-					` GROUP BY name` +
-					` HAVING ROWNUM == 1`;
-
-				return [question, query];
-			case 5:
-				question = `Who is the lightest player to hit 50 home-runs in a season?`;
-				query = `WITH Weights AS (` +
-					`SELECT playerID, nameFirst, nameLast, weight` +
-					` FROM People)` +
-					`SELECT nameFirst, nameLast, MIN(weight)` +
-					` FROM Weights w JOIN Batting b ON b.playerID == w.playerID` +
-					` GROUP BY weight` +
-					` HAVING HR > 50`;
-				return [question, query];
-			case 6:
-				question = `Which state has produced the most professional players?`;
-				query = `SELECT birthState, COUNT(birthState)` +
-					` FROM People` +
-					` GROUP BY birthState` +
-					` SORT BY COUNT(birthState) ASC` +
-					` HAVING ROWNUM == 1`;
-
-				return [question, query]
-
-			default:
-
-		}
-		*/
 	}
 }
 export default QuestionGenerator;

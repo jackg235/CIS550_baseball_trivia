@@ -43,15 +43,18 @@ class App extends Component {
     this.addToLeaderboard = this.addToLeaderboard.bind(this)
   }
 
+  // Update the name passed into the text box
   handleChange(event) {
     this.setState({value: event.target.value});
   }
 
+  // Get an random question and the leaderboard upon creation
   async componentDidMount() {
     this.getRandomQuestion()
     this.getLeaderboard()
   }
 
+  // Shuffles an array
   shuffle(a) {
     for (let i = a.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -60,7 +63,8 @@ class App extends Component {
     return a;
   }
 
-
+  // Uses the question generator to generate a random question, execute 
+  // the associated query, and update the state based on its response
   getRandomQuestion() {
     let questionAndQuery = this.state.qg.generateQuestion();
     let questionRes = questionAndQuery[0];
@@ -83,29 +87,27 @@ class App extends Component {
     }).then(results => {
       if (!results) return;
 
-      // get the possible answers for the query
+      // Get the possible answers for the query (tOp 10 results)
       var arrayRes = results["results"];
       console.log(arrayRes)
       if (arrayRes.length < 4) {
         console.log('not enough query results');
         return this.getRandomQuestion();
       }
-      // create array for 3 other viable choices
+
+      // Create array for 3 other viable choices
       var arr = [];
       while (arr.length < 3) {
         var r = Math.ceil(Math.random() * (arrayRes.length - 1));
         if (arr.indexOf(r) === -1) arr.push(r);
       }
 
-      // shuffle results
+      // Shuffle results
       var shuffledArray = [arrayRes[0], arrayRes[arr[0]], arrayRes[arr[1]], arrayRes[arr[2]]];
-
       this.shuffle(shuffledArray);
 
-      console.log(shuffledArray);
-
+      // Display the results by updating the state
       let correctIndex = shuffledArray.indexOf(arrayRes[0]);
-
       if (shuffledArray[0].length == 2) {
         this.setState({
           correctAnswer: arrayRes[0][0] + ", " + shuffledArray[0][1],
@@ -135,6 +137,7 @@ class App extends Component {
     });
   }
 
+  // Pulls the leaderboard from the database
   getLeaderboard() {
     fetch('http://localhost:5000/leaderboard', {
       method: 'get',
@@ -155,6 +158,7 @@ class App extends Component {
     })
   }
 
+  // Adds the most recent score to the leaderboard
   addToLeaderboard() {
     fetch('http://localhost:5000/addLeaderboard', {
       method: 'post',
@@ -170,6 +174,7 @@ class App extends Component {
     this.getLeaderboard();
   }
 
+  // Checks if an answer was correct upon submission and updates accordingly
   clickSubmit() {
     if (this.state.submitOrNext == "Submit") {
       var anythingChecked = document.getElementById("a0").checked || (
@@ -256,12 +261,14 @@ class App extends Component {
     return body;
   };
 
+  // Hides or shows the popup for a finished game
   modalToggle() {
     this.setState({
       modalIsOpen: !this.state.modalIsOpen
     })
   }
 
+  // Resets the game upon button press
   resetGame() {
     this.setState({
       countCorrect: 0,
@@ -271,6 +278,7 @@ class App extends Component {
     this.toggleGameElements();
   }
 
+  // Resets the game upon request
   toggleGameElements() {
     this.setState({
       name: document.getElementById("text").value,

@@ -16,6 +16,7 @@ class Timer extends Component {
         this.tick = this.tick.bind(this);
     }
 
+    // Moves the state down a second
     tick() {
         var min = parseInt(this.state.minutes);
         var sec = parseInt(this.state.seconds);
@@ -37,13 +38,15 @@ class Timer extends Component {
             seconds: sec < 10 ? "0" + sec : "" + sec
         })
     
+        // Handle the clock reaching zero by ending the game
         if (min === 0 & sec === 0) {
-        clearInterval(this.intervalHandle);
-        this.props.modalToggle();
-        this.props.addToLeaderboard();
+            clearInterval(this.intervalHandle);
+            this.props.modalToggle();
+            this.props.addToLeaderboard();
         }
       }
     
+    // Trigger the countdown
     startCountDown() {
         
         this.setState({

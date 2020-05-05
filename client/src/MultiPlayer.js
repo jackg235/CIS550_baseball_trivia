@@ -45,10 +45,12 @@ class Multiplayer extends Component {
     
       }
     
+      // Generate a question upon loading
       async componentDidMount() {
         this.getRandomQuestion()
       }
 
+      // Shuffle an array
       shuffle(a) {
         for (let i = a.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
@@ -57,6 +59,7 @@ class Multiplayer extends Component {
         return a;
       }
 
+      // Generares a random question and updates the state
       getRandomQuestion() {
         let questionAndQuery = this.state.qg.generateQuestion();
         let questionRes = questionAndQuery[0];
@@ -79,25 +82,23 @@ class Multiplayer extends Component {
         }).then(results => {
           if (!results) return;
     
-          // get the possible answers for the query
+          // Get the possible answers for the query
           var arrayRes = results["results"];
           console.log(arrayRes)
-          // create array for 3 other viable choices
+          // Create array for 3 other viable choices
           var arr = [];
           while (arr.length < 3) {
             var r = Math.ceil(Math.random() * (arrayRes.length - 1));
             if (arr.indexOf(r) === -1) arr.push(r);
           }
     
-          // shuffle results
+          // Shuffle results
           var shuffledArray = [arrayRes[0], arrayRes[arr[0]], arrayRes[arr[1]], arrayRes[arr[2]]];
-    
           this.shuffle(shuffledArray);
-    
-          console.log(shuffledArray);
     
           let correctIndex = shuffledArray.indexOf(arrayRes[0]);
     
+          // Display the results
           if (shuffledArray[0].length == 2) {
             this.setState({
               correctAnswer: arrayRes[0][0] + ", " + shuffledArray[0][1],
@@ -128,6 +129,7 @@ class Multiplayer extends Component {
         });
       }
 
+      // Checks for a correct answer and updates the state accordingly
       clickSubmit() {
         if (this.state.submitOrNext == "Submit") {
           var anythingChecked = document.getElementById("a0").checked || (
@@ -223,6 +225,7 @@ class Multiplayer extends Component {
         return body;
       };
 
+      // Displays or hides the popup at game completion
       modalToggle() {
           console.log("ModalToggle");
         this.setState({
@@ -230,6 +233,7 @@ class Multiplayer extends Component {
         })
       }
     
+      // Restarts the game
       resetGame() {
         this.setState({
           currentPlayer: 1,
@@ -243,6 +247,7 @@ class Multiplayer extends Component {
       }
 
 
+      // Starts or resets the game
       toggleGameElements() {
 
         if (this.state.startOrReset == "Start") {
